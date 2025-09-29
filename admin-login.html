@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login - Giatech Shipping</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin Login</h2>
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input type="email" id="email" required placeholder="Enter admin email">
+
+      <label for="password">Password</label>
+      <input type="password" id="password" required placeholder="Enter password">
+
+      <button type="submit">Login</button>
+    </form>
+    <p id="error" style="color:red;"></p>
+  </div>
+
+  <script type="module">
+    // Firebase Config (replace with YOUR details)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
+  authDomain: "giatech-shipping.firebaseapp.com",
+  databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
+  projectId: "giatech-shipping",
+  storageBucket: "giatech-shipping.firebasestorage.app",
+  messagingSenderId: "906996624627",
+  appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const loginForm = document.getElementById("loginForm");
+    const errorMsg = document.getElementById("error");
+
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          window.location.href = "admin.html"; // Redirect to Admin Dashboard
+        })
+        .catch((error) => {
+          errorMsg.textContent = error.message;
+        });
+    });
+  </script>
+</body>
+</html>
