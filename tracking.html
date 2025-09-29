@@ -97,19 +97,21 @@
           return;
         }
 
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          resultDiv.innerHTML = `
-            <h3>Shipment Details</h3>
-            <p><b>Tracking Number:</b> ${data.trackingNumber}</p>
-            <p><b>Status:</b> ${data.status}</p>
-            <p><b>Destination:</b> ${data.destination}</p>
-            <p><b>Last Updated:</b> ${data.lastUpdated}</p>
-          `;
-        });
-      } catch (err) {
-        console.error("Error retrieving data:", err);
-        errorDiv.textContent = "⚠️ Error retrieving shipment data.";
+        .then((doc) => {
+  if (doc.exists) {
+    const data = doc.data();
+    resultDiv.innerHTML = `
+      <h3>Shipment Found</h3>
+      <p><strong>Status:</strong> ${data.status}</p>
+      <p><strong>Destination:</strong> ${data.destination}</p>
+      <p><strong>Last Updated:</strong> ${data.lastUpdated}</p>
+      <p><strong>Proof of Delivery:</strong> ${data.proofNote || "Not available yet"}</p>
+    `;
+  } else {
+    resultDiv.innerHTML = `<p style="color:red;">Shipment not found</p>`;
+  }
+})
+
       }
     }
     window.trackShipment = trackShipment;
