@@ -3,63 +3,75 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Giatech Shipping</title>
-  
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+  <title>Giatech Shipping - Track Your Package</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+    h1 { color: #007bff; }
+    input, button { margin: 10px; padding: 8px; }
+    #trackingResult { margin-top: 20px; }
+    #proofSection img { max-width: 300px; margin-top: 10px; }
+  </style>
 </head>
 <body>
-  <!-- Company Header -->
-  <header>
-    <div class="logo">
-      🚢 ✈️ 📦
-      <h1>Giatech Shipping</h1>
-    </div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="tracking.html">Track Order</a>
-      <a href="login.html">Admin</a>
-    </nav>
-  </header>
+  <h1>Giatech Shipping</h1>
+  <p>Track your shipment below:</p>
+  <input type="text" id="trackingInput" placeholder="Enter Tracking Number">
+  <button id="trackBtn">Track</button>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <h2>Fast • Reliable • Secure</h2>
-    <p>Track your shipments worldwide with Giatech Shipping</p>
-  </section>
+  <div id="trackingResult"></div>
+  <div id="proofSection"></div>
 
-  <!-- Tracking Box -->
-  <section class="tracking-box">
-    <h3>Track Your Shipment</h3>
-    <form id="trackingForm">
-      <input type="text" id="trackingNumber" placeholder="Enter Tracking Number" required>
-      <button type="submit">Track</button>
-    </form>
-    <div id="trackingResult"></div>
-  </section>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-  <!-- Footer -->
-  <footer>
-    <p>© 2025 Giatech Shipping. All rights reserved.</p>
-  </footer>
-
-  <!-- Firebase Config -->
-  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
       authDomain: "giatech-shipping.firebaseapp.com",
       databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
       projectId: "giatech-shipping",
-      storageBucket: "giatech-shipping.firebasestorage.app",
+      storageBucket: "giatech-shipping.appspot.com",
       messagingSenderId: "906996624627",
       appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
     };
-    firebase.initializeApp(firebaseConfig);
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    document.getElementById("trackBtn").addEventListener("click", async () => {
+      const trackingNumber = document.getElementById("trackingInput").value;
+      const shipmentRef = ref(db, "shipments/" + trackingNumber);
+
+      try {
+        const snapshot = await get(shipmentRef);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          document.getElementById("trackingResult").innerHTML = `
+            <p><strong>Status:</strong> ${data.status || "Not Available"}</p>
+          `;
+
+          if (data.proofURL) {
+            if (data.proofURL.endsWith(".pdf")) {
+              document.getElementById("proofSection").innerHTML = `
+                <p><strong>Delivery Proof:</strong> <a href="${data.proofURL}" target="_blank">📄 View PDF</a></p>
+              `;
+            } else {
+              document.getElementById("proofSection").innerHTML = `
+                <p><strong>Delivery Proof:</strong></p>
+                <img src="${data.proofURL}" alt="Delivery Proof">
+              `;
+            }
+          } else {
+            document.getElementById("proofSection").innerHTML = "<p>No delivery proof uploaded yet.</p>";
+          }
+        } else {
+          document.getElementById("trackingResult").innerText = "❌ Tracking number not found.";
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById("trackingResult").innerText = "⚠️ Error retrieving shipment.";
+      }
+    });
   </script>
 </body>
 </html>
