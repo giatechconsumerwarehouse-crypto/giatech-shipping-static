@@ -1,20 +1,51 @@
-// Import Firebase SDK
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+// Import from firebase.js
+import { auth } from "./firebase.js";
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut } 
+  from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-// ✅ Your Firebase Config (already provided)
-const firebaseConfig = {
-  apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
-  authDomain: "giatech-shipping.firebaseapp.com",
-  databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
-  projectId: "giatech-shipping",
-  storageBucket: "giatech-shipping.firebasestorage.app",
-  messagingSenderId: "906996624627",
-  appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
-};
+/* ===============================
+   LOGIN PAGE (login.html)
+================================= */
+const loginForm = document.getElementById("login-form");
 
-// ✅ Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getDatabase(app);
+if (loginForm) {
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        // ✅ Redirect to Admin page after login
+        window.location.href = "admin.html";
+      })
+      .catch((error) => {
+        alert("Login failed: " + error.message);
+      });
+  });
+}
+
+/* ===============================
+   ADMIN PAGE (admin.html)
+   Protect the page → Redirect if not logged in
+================================= */
+const logoutBtn = document.getElementById("logout-btn");
+
+if (window.location.pathname.includes("admin.html")) {
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      // Not logged in → go back to login
+      window.location.href = "login.html";
+    }
+  });
+}
+
+// ✅ Logout
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    signOut(auth).then(() => {
+      window.location.href = "login.html";
+    });
+  });
+}
