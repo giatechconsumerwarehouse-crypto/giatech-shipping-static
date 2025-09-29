@@ -4,91 +4,73 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel - Giatech Shipping</title>
-  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>🚚 Admin Panel - Manage Shipments</h2>
+    <form id="shipmentForm">
+      <label>Tracking Number:</label>
+      <input type="text" id="trackingNumber" required><br><br>
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getFirestore, setDoc, doc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+      <label>Status:</label>
+      <input type="text" id="status" required><br><br>
 
-    // 🔑 Replace with your Firebase config
+      <label>Destination:</label>
+      <input type="text" id="destination" required><br><br>
+
+      <label>Last Updated:</label>
+      <input type="date" id="lastUpdated" required><br><br>
+
+      <label>Proof of Delivery Note:</label>
+      <input type="text" id="proofNote"><br><br>
+
+      <button type="submit">Save Shipment</button>
+    </form>
+
+    <p id="message"></p>
+  </div>
+
+  <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
+  apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
   authDomain: "giatech-shipping.firebaseapp.com",
+  databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
   projectId: "giatech-shipping",
   storageBucket: "giatech-shipping.firebasestorage.app",
   messagingSenderId: "906996624627",
   appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
 };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
 
-    async function addUpdateShipment(event) {
-      event.preventDefault();
-      const number = document.getElementById("shipNumber").value;
-      const status = document.getElementById("shipStatus").value;
-      const location = document.getElementById("shipLocation").value;
-      const eta = document.getElementById("shipETA").value;
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-      await setDoc(doc(db, "shipments", number), {
-        status, location, eta
-      });
+    document.getElementById("shipmentForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-      alert("✅ Shipment updated successfully!");
-      document.getElementById("shipment-form").reset();
-      displayShipments();
-    }
+      const trackingNumber = document.getElementById("trackingNumber").value.trim();
+      const status = document.getElementById("status").value.trim();
+      const destination = document.getElementById("destination").value.trim();
+      const lastUpdated = document.getElementById("lastUpdated").value;
+      const proofNote = document.getElementById("proofNote").value.trim();
 
-    async function displayShipments() {
-      const list = document.getElementById("shipment-list");
-      list.innerHTML = "";
-      const querySnapshot = await getDocs(collection(db, "shipments"));
-      querySnapshot.forEach((docSnap) => {
-        const s = docSnap.data();
-        list.innerHTML += `
-          <div class="card">
-            <h3>Tracking #${docSnap.id}</h3>
-            <p>Status: ${s.status}</p>
-            <p>Location: ${s.location}</p>
-            <p>ETA: ${s.eta}</p>
-          </div>
-        `;
-      });
-    }
-
-    window.addEventListener("DOMContentLoaded", displayShipments);
-    window.addUpdateShipment = addUpdateShipment;
+      try {
+        await db.collection("shipments").doc(trackingNumber).set({
+          trackingNumber,
+          status,
+          destination,
+          lastUpdated,
+          proofNote
+        });
+        document.getElementById("message").innerHTML = "<span style='color:green;'>Shipment saved successfully ✅</span>";
+        e.target.reset();
+      } catch (error) {
+        document.getElementById("message").innerHTML = "<span style='color:red;'>Error: " + error.message + "</span>";
+      }
+    });
   </script>
-</head>
-<body>
-
-  <header>
-    <h1>🛠 Admin Panel</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="tracking.html">Tracking</a>
-      <a href="admin.html">Admin</a>
-    </nav>
-  </header>
-
-  <div class="container">
-    <h2>📦 Add / Update Shipment</h2>
-    <form id="shipment-form" onsubmit="addUpdateShipment(event)">
-      <input type="text" id="shipNumber" placeholder="Tracking Number" required>
-      <input type="text" id="shipStatus" placeholder="Status (In Transit, Delivered...)" required>
-      <input type="text" id="shipLocation" placeholder="Current Location" required>
-      <input type="text" id="shipETA" placeholder="ETA or Delivered" required>
-      <button type="submit">Save</button>
-    </form>
-
-    <h2>📋 Current Shipments</h2>
-    <div id="shipment-list"></div>
-  </div>
-
-  <footer>
-    <p>&copy; 2025 Giatech Shipping. All Rights Reserved.</p>
-  </footer>
-
 </body>
 </html>
