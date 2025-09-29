@@ -27,12 +27,31 @@
 
     <!-- Result Box -->
     <div id="result" style="display:none;">
-      <h3>📋 Shipment Details</h3>
-      <p><strong>Tracking ID:</strong> <span id="rTrackingId"></span></p>
-      <p><strong>Address:</strong> <span id="rAddress"></span></p>
-      <p><strong>Status:</strong> <span id="rStatus"></span></p>
-      <p><strong>Expected Delivery:</strong> <span id="rExpected"></span></p>
-      <p><strong>Items:</strong> <span id="rItems"></span></p>
+    // Define steps
+const steps = ["Order Placed", "Processing", "Shipped", "Delivered"];
+
+// Find current step index
+const currentStep = steps.indexOf(data.status);
+
+let progressHTML = `<h3>Shipment Progress</h3>
+<div class="progress-container">`;
+
+steps.forEach((step, index) => {
+  const active = index <= currentStep ? "active" : "";
+  progressHTML += `
+    <div class="progress-step ${active}">
+      <div class="step-circle">${index + 1}</div>
+      <div class="step-label">${step}</div>
+    </div>
+    ${index < steps.length - 1 ? `<div class="progress-line ${active}"></div>` : ""}
+  `;
+});
+
+progressHTML += `</div>
+<p><b>Location:</b> ${data.location}</p>
+<p><b>Last Update:</b> ${data.updated}</p>`;
+
+resultDiv.innerHTML = progressHTML;
 
       <h4>📍 Timeline</h4>
       <ul id="rTimeline" class="timeline"></ul>
