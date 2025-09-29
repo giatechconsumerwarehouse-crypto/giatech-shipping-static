@@ -2,31 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Track Shipment - Giatech Shipping</title>
+  <title>Giatech Shipping</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="track-container">
-    <h2>Track Your Shipment</h2>
-    <form id="trackForm">
-      <input type="text" id="trackingInput" placeholder="Enter Tracking Number" required>
-      <button type="submit">Track</button>
-    </form>
-    <p id="trackError" class="error"></p>
-  </div>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">Giatech Shipping</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tracking.html">Track</a></li>
+        <li><a href="admin-login.html">Admin</a></li>
+      </ul>
+    </div>
+  </nav>
 
-  <script>
-    document.getElementById("trackForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const trackingNumber = document.getElementById("trackingInput").value.trim();
-
-      if (trackingNumber) {
-        window.location.href = `tracking.html?tracking=${trackingNumber}`;
-      } else {
-        document.getElementById("trackError").innerText = "Please enter a tracking number.";
-      }
-    });
-  </script>
+  <!-- Main Section -->
+  <section class="main">
+    <h1>Welcome to Giatech Shipping</h1>
+    <p>Track your shipment in real-time with ease.</p>
+    <a href="tracking.html" class="btn">Track Shipment</a>
+  </section>
 </body>
 </html>
