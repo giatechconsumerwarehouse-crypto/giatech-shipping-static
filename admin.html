@@ -4,18 +4,74 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel - Giatech Shipping</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-    textarea { width: 80%; height: 100px; margin: 10px; }
-    button { padding: 10px; font-size: 16px; }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // Fake database (in real site, we will connect to backend)
+    let shipments = {
+      "12345": { status: "In Transit", location: "Manila", eta: "2 Days" },
+      "67890": { status: "Delivered", location: "Quezon City", eta: "Delivered" }
+    };
+
+    function addUpdateShipment(event) {
+      event.preventDefault();
+      const number = document.getElementById("shipNumber").value;
+      const status = document.getElementById("shipStatus").value;
+      const location = document.getElementById("shipLocation").value;
+      const eta = document.getElementById("shipETA").value;
+
+      shipments[number] = { status, location, eta };
+      alert("✅ Shipment updated successfully!");
+      document.getElementById("shipment-form").reset();
+      displayShipments();
+    }
+
+    function displayShipments() {
+      const list = document.getElementById("shipment-list");
+      list.innerHTML = "";
+      for (const number in shipments) {
+        const s = shipments[number];
+        list.innerHTML += `
+          <div class="card">
+            <h3>Tracking #${number}</h3>
+            <p>Status: ${s.status}</p>
+            <p>Location: ${s.location}</p>
+            <p>ETA: ${s.eta}</p>
+          </div>
+        `;
+      }
+    }
+
+    window.onload = displayShipments;
+  </script>
 </head>
 <body>
-  <h1>⚙️ Admin Panel</h1>
-  <p>Control shipments, stop movement, and send updates.</p>
-  <textarea placeholder="Enter shipment updates..."></textarea><br>
-  <button>Submit</button>
-  <br><br>
-  <a href="index.html">⬅ Back to Home</a>
+
+  <header>
+    <h1>🛠 Admin Panel</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="tracking.html">Tracking</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2>📦 Add / Update Shipment</h2>
+    <form id="shipment-form" onsubmit="addUpdateShipment(event)">
+      <input type="text" id="shipNumber" placeholder="Tracking Number" required>
+      <input type="text" id="shipStatus" placeholder="Status (In Transit, Delivered...)" required>
+      <input type="text" id="shipLocation" placeholder="Current Location" required>
+      <input type="text" id="shipETA" placeholder="ETA or Delivered" required>
+      <button type="submit">Save</button>
+    </form>
+
+    <h2>📋 Current Shipments</h2>
+    <div id="shipment-list"></div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Giatech Shipping. All Rights Reserved.</p>
+  </footer>
+
 </body>
 </html>
