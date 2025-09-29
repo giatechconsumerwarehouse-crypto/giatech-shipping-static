@@ -2,31 +2,97 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Giatech Shipping</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Track Your Shipment - Giatech Shipping</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 </head>
 <body>
-
-  <header>
-    <h1>📦 Giatech Shipping</h1>
-    <p>Fast, reliable, and secure deliveries across the Philippines</p>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="tracking.html">Tracking</a>
-      <a href="admin.html">Admin</a>
-    </nav>
-  </header>
-
   <div class="container">
-    <h2>Welcome to Giatech Shipping</h2>
-    <p>We provide trusted logistics and delivery solutions nationwide. Track your shipments easily and securely.</p>
-    <button onclick="window.location.href='tracking.html'">Track a Shipment</button>
+    <h1>📦 Giatech Shipping Tracker</h1>
+    <p>Enter your tracking number to view shipment details.</p>
+
+    <form id="trackForm">
+      <input type="text" id="trackId" required placeholder="Enter Tracking Number">
+      <button type="submit">Track</button>
+    </form>
+
+    <div id="result" class="card" style="display:none;">
+      <h2>Shipment Details</h2>
+      <p><strong>Tracking Number:</strong> <span id="rTracking"></span></p>
+      <p><strong>Address:</strong> <span id="rAddress"></span></p>
+      <p><strong>Status:</strong> <span id="rStatus"></span></p>
+      <p><strong>Expected Delivery:</strong> <span id="rExpected"></span></p>
+
+      <h3>📍 Timeline</h3>
+      <ul id="rTimeline"></ul>
+
+      <h3>📦 Package Items</h3>
+      <p id="rItems"></p>
+    </div>
+
+    <p id="error" style="color:red;"></p>
   </div>
 
-  <footer>
-    <p>&copy; 2025 Giatech Shipping. All Rights Reserved. | Contact: support@giatechshipping.com</p>
-  </footer>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
+    // Firebase Config (replace with YOUR details)
+    const firebaseConfig = {
+  apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
+  authDomain: "giatech-shipping.firebaseapp.com",
+  databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
+  projectId: "giatech-shipping",
+  storageBucket: "giatech-shipping.firebasestorage.app",
+  messagingSenderId: "906996624627",
+  appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const form = document.getElementById("trackForm");
+    const resultBox = document.getElementById("result");
+    const errorBox = document.getElementById("error");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const trackId = document.getElementById("trackId").value.trim();
+
+      try {
+        const docRef = doc(db, "shipments", trackId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          document.getElementById("rTracking").textContent = data.trackingId;
+          document.getElementById("rAddress").textContent = data.address;
+          document.getElementById("rStatus").textContent = data.status;
+          document.getElementById("rExpected").textContent = data.expected;
+
+          // Timeline
+          const timelineList = document.getElementById("rTimeline");
+          timelineList.innerHTML = "";
+          data.timeline.forEach((t) => {
+            const li = document.createElement("li");
+            li.textContent = t.trim();
+            timelineList.appendChild(li);
+          });
+
+          // Items
+          document.getElementById("rItems").textContent = data.items;
+
+          resultBox.style.display = "block";
+          errorBox.textContent = "";
+        } else {
+          resultBox.style.display = "none";
+          errorBox.textContent = "❌ No shipment found with this tracking number.";
+        }
+      } catch (err) {
+        errorBox.textContent = "❌ Error: " + err.message;
+      }
+    });
+  </script>
 </body>
 </html>
