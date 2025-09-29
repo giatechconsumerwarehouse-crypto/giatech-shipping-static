@@ -1,64 +1,71 @@
-/* ===============================
-   Global Styles
-================================= */
+/* ====== General Styling ====== */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: #f9f9f9;
+  background: #f8f9fa;
   color: #333;
-}
-
-h1, h2, h3 {
-  color: #222;
-  margin-bottom: 15px;
   text-align: center;
 }
 
-a {
-  color: #007bff;
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
-}
-
-/* ===============================
-   Containers
-================================= */
-.container {
-  width: 90%;
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-}
-
-/* ===============================
-   Buttons
-================================= */
-button {
-  background: #007bff;
+.header {
+  background: #004080;
   color: #fff;
-  padding: 10px 20px;
-  margin: 8px;
-  border: none;
+  padding: 20px 10px;
+}
+
+.hero {
+  padding: 50px 20px;
+  background: linear-gradient(to right, #007bff, #00aaff);
+  color: white;
+}
+
+.hero h2 {
+  margin-bottom: 15px;
+}
+
+.buttons {
+  margin-top: 20px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 20px;
+  margin: 10px;
+  background: #fff;
+  color: #007bff;
   border-radius: 5px;
-  cursor: pointer;
-  font-size: 15px;
+  text-decoration: none;
+  font-weight: bold;
   transition: 0.3s;
 }
-button:hover {
-  background: #0056b3;
+
+.btn:hover {
+  background: #004080;
+  color: white;
 }
 
-/* ===============================
-   Forms
-================================= */
-input, select {
-  width: 90%;
-  max-width: 300px;
-  padding: 10px;
-  margin: 8px 0;
-  border: 1px solid #ddd;
-  border-radius
-   
+.btn.secondary {
+  background: #333;
+  color: white;
+}
+
+.about {
+  padding: 40px 20px;
+}
+
+.about ul {
+  list-style: none;
+  padding: 0;
+}
+
+.about li {
+  margin: 10px 0;
+}
+
+.footer {
+  background: #004080;
+  color: white;
+  padding: 15px;
+  margin-top: 30px;
+}
