@@ -44,3 +44,76 @@
   font-size: 14px;
   color: #333;
 }
+
+/* ==========================
+   Admin Panel Styling
+========================== */
+.admin-body {
+  background: #121212;
+  color: #eee;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.admin-header {
+  background: #1f1f1f;
+  color: #4da6ff;
+  padding: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.admin-card {
+  background: #1e1e1e;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 40px auto;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.admin-card h2 {
+  color: #4da6ff;
+}
+
+.admin-card input,
+.admin-card select {
+  width: 90%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+}
+
+.admin-card input {
+  background: #2c2c2c;
+  color: #fff;
+}
+
+.admin-card select {
+  background: #2c2c2c;
+  color: #fff;
+}
+
+.admin-card button {
+  padding: 12px 20px;
+  background: #4da6ff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+}
+
+.admin-card button:hover {
+  background: #1a75ff;
+}
+
+#updateMessage, #loginMessage {
+  margin-top: 10px;
+  font-size: 14px;
+}
