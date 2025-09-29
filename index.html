@@ -8,8 +8,19 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 </head>
 <body>
+  <!-- Company Header -->
+  <header>
+    <div class="logo">
+      <span class="icon">🚢</span>
+      <span class="icon">📦</span>
+      <span class="icon">✈️</span>
+      <h1>Giatech Shipping</h1>
+    </div>
+  </header>
+
+  <!-- Client Tracking Section -->
   <div class="container">
-    <h1>📦 Giatech Shipping Tracker</h1>
+    <h2>📦 Shipment Tracker</h2>
     <p>Enter your tracking number to view shipment details.</p>
 
     <form id="trackForm">
@@ -34,20 +45,21 @@
     <p id="error" style="color:red;"></p>
   </div>
 
+  <!-- Firebase & Tracking Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    // Firebase Config (replace with YOUR details)
+    // ✅ Your Firebase Config
     const firebaseConfig = {
-  apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
-  authDomain: "giatech-shipping.firebaseapp.com",
-  databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
-  projectId: "giatech-shipping",
-  storageBucket: "giatech-shipping.firebasestorage.app",
-  messagingSenderId: "906996624627",
-  appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
-};
+      apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
+      authDomain: "giatech-shipping.firebaseapp.com",
+      databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
+      projectId: "giatech-shipping",
+      storageBucket: "giatech-shipping.firebasestorage.app",
+      messagingSenderId: "906996624627",
+      appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -74,14 +86,16 @@
           // Timeline
           const timelineList = document.getElementById("rTimeline");
           timelineList.innerHTML = "";
-          data.timeline.forEach((t) => {
-            const li = document.createElement("li");
-            li.textContent = t.trim();
-            timelineList.appendChild(li);
-          });
+          if (Array.isArray(data.timeline)) {
+            data.timeline.forEach((t) => {
+              const li = document.createElement("li");
+              li.textContent = t.trim();
+              timelineList.appendChild(li);
+            });
+          }
 
           // Items
-          document.getElementById("rItems").textContent = data.items;
+          document.getElementById("rItems").textContent = data.items || "No items listed.";
 
           resultBox.style.display = "block";
           errorBox.textContent = "";
