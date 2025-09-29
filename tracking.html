@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>Tracking - Giatech Shipping</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 </head>
 <body>
   <!-- Header -->
   <header>
     <div class="logo">
-      <span class="icon">🚢</span>
-      <span class="icon">📦</span>
-      <span class="icon">✈️</span>
+      🚢 📦 ✈️
       <h1>Giatech Shipping</h1>
     </div>
     <nav>
@@ -23,32 +25,85 @@
   <!-- Tracking Section -->
   <section class="tracking-box">
     <h2>Shipment Status</h2>
-    <div class="progress-container">
-      <div class="progress-step active">
+    <form id="trackingForm">
+      <input type="text" id="trackingNumber" placeholder="Enter Tracking Number" required>
+      <button type="submit">Check</button>
+    </form>
+
+    <!-- Progress Bar -->
+    <div class="progress-container" id="progressTracker" style="display:none;">
+      <div class="progress-step" id="step1">
         <div class="step-circle">1</div>
         <div class="step-label">Order Placed</div>
       </div>
       <div class="progress-line"></div>
-      <div class="progress-step">
+      <div class="progress-step" id="step2">
         <div class="step-circle">2</div>
         <div class="step-label">Processing</div>
       </div>
       <div class="progress-line"></div>
-      <div class="progress-step">
+      <div class="progress-step" id="step3">
         <div class="step-circle">3</div>
         <div class="step-label">Shipped</div>
       </div>
       <div class="progress-line"></div>
-      <div class="progress-step">
+      <div class="progress-step" id="step4">
         <div class="step-circle">4</div>
         <div class="step-label">Delivered</div>
       </div>
     </div>
+
+    <p id="statusMessage" style="margin-top:20px;"></p>
   </section>
 
   <!-- Footer -->
   <footer>
     <p>&copy; 2025 Giatech Shipping. All rights reserved.</p>
   </footer>
+
+  <!-- Firebase Config + Script -->
+  <script>
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
+      authDomain: "giatech-shipping.firebaseapp.com",
+      databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
+      projectId: "giatech-shipping",
+      storageBucket: "giatech-shipping.firebasestorage.app",
+      messagingSenderId: "906996624627",
+      appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Function to update UI
+    function updateProgress(step) {
+      // Reset all steps
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById("step" + i).classList.remove("active");
+      }
+      // Highlight correct step
+      if (step >= 1 && step <= 4) {
+        document.getElementById("step" + step).classList.add("active");
+      }
+    }
+
+    // Form submit
+    document.getElementById("trackingForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const trackingNumber = document.getElementById("trackingNumber").value.trim();
+
+      db.ref("shipments/" + trackingNumber).once("value").then(snapshot => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          document.getElementById("progressTracker").style.display = "flex";
+          document.getElementById("statusMessage").innerText = "Current Status: " + data.status;
+          updateProgress(data.step);
+        } else {
+          document.getElementById("statusMessage").innerText = "Tracking number not found.";
+        }
+      });
+    });
+  </script>
 </body>
 </html>
