@@ -2,166 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard - Giatech Shipping</title>
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
-    .hidden { display: none; }
-    input, select { padding: 10px; margin: 5px; width: 250px; }
-    button { padding: 10px 20px; margin: 10px; cursor: pointer; }
-    #shipmentsList { margin-top: 20px; text-align: left; max-width: 600px; margin: auto; }
-    .shipment-card { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 8px; }
-  </style>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
 </head>
 <body>
-
-  <h1>Admin Dashboard - Giatech Shipping</h1>
-
-  <!-- Login Form -->
-  <div id="loginDiv">
-    <h3>Admin Login</h3>
-    <input type="email" id="adminEmail" placeholder="Email"><br>
-    <input type="password" id="adminPassword" placeholder="Password"><br>
-    <button onclick="login()">Login</button>
-    <p id="loginError" style="color:red;"></p>
+  <div class="admin-dashboard">
+    <h2>Admin Dashboard</h2>
+    <form id="addShipmentForm">
+      <input type="text" id="trackingId" placeholder="Tracking ID" required>
+      <select id="status" required>
+        <option value="Order Placed">Order Placed</option>
+        <option value="Processing">Processing</option>
+        <option value="Shipped">Shipped</option>
+        <option value="Delivered">Delivered</option>
+      </select>
+      <button type="submit">Add / Update Shipment</button>
+    </form>
+    <button id="logoutBtn">Logout</button>
   </div>
 
-  <!-- Admin Panel -->
-  <div id="adminPanel" class="hidden">
-    <h3>Welcome, Admin</h3>
-    <button onclick="logout()">Logout</button>
-
-    <h3>Update Shipment</h3>
-    <input type="text" id="trackingNumber" placeholder="Tracking Number"><br>
-    <input type="text" id="location" placeholder="Current Location"><br>
-    <select id="status">
-      <option value="Order Placed">Order Placed</option>
-      <option value="Processing">Processing</option>
-      <option value="Shipped">Shipped</option>
-      <option value="Delivered">Delivered</option>
-    </select><br>
-    <input type="file" id="proofFile"><br>
-    <button onclick="updateShipment()">Save / Update</button>
-    <p id="updateMessage" style="color:green;"></p>
-
-    <h3>All Shipments</h3>
-    <div id="shipmentsList"></div>
-  </div>
-
-  <script>
-    // 🔹 Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
-      authDomain: "giatech-shipping.firebaseapp.com",
-      databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
-      projectId: "giatech-shipping",
-      storageBucket: "giatech-shipping.appspot.com",
-      messagingSenderId: "906996624627",
-      appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
-    };
-
-    // 🔹 Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
-    const storage = firebase.storage();
-
-    // 🔹 Login
-    function login() {
-      const email = document.getElementById("adminEmail").value;
-      const password = document.getElementById("adminPassword").value;
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          document.getElementById("loginDiv").classList.add("hidden");
-          document.getElementById("adminPanel").classList.remove("hidden");
-          loadShipments();
-        })
-        .catch(error => {
-          document.getElementById("loginError").innerText = error.message;
-        });
-    }
-
-    // 🔹 Logout
-    function logout() {
-      auth.signOut().then(() => {
-        document.getElementById("loginDiv").classList.remove("hidden");
-        document.getElementById("adminPanel").classList.add("hidden");
-      });
-    }
-
-    // 🔹 Update Shipment
-    async function updateShipment() {
-      const trackingNumber = document.getElementById("trackingNumber").value.trim();
-      const location = document.getElementById("location").value;
-      const status = document.getElementById("status").value;
-      const file = document.getElementById("proofFile").files[0];
-
-      if (!trackingNumber) {
-        alert("Enter a tracking number");
-        return;
-      }
-
-      let proofURL = null;
-      if (file) {
-        const storageRef = storage.ref("proofs/" + trackingNumber + "_" + file.name);
-        await storageRef.put(file);
-        proofURL = await storageRef.getDownloadURL();
-      }
-
-      const shipmentData = {
-        trackingNumber,
-        location,
-        status,
-        timestamp: Date.now(),
-        proof: proofURL || null
-      };
-
-      db.ref("shipments/" + trackingNumber).set(shipmentData)
-        .then(() => {
-          document.getElementById("updateMessage").innerText = "✅ Shipment updated successfully!";
-          loadShipments();
-        })
-        .catch(err => alert(err.message));
-    }
-
-    // 🔹 Load All Shipments
-    function loadShipments() {
-      db.ref("shipments").on("value", snapshot => {
-        const list = document.getElementById("shipmentsList");
-        list.innerHTML = "";
-        snapshot.forEach(child => {
-          const data = child.val();
-          const div = document.createElement("div");
-          div.className = "shipment-card";
-          div.innerHTML = `
-            <p><strong>${data.trackingNumber}</strong></p>
-            <p>Status: ${data.status}</p>
-            <p>Location: ${data.location}</p>
-            <p>Updated: ${new Date(data.timestamp).toLocaleString()}</p>
-            ${data.proof ? `<a href="${data.proof}" target="_blank">📎 View Proof</a>` : ""}
-          `;
-          list.appendChild(div);
-        });
-      });
-    }
-
-    // 🔹 Keep session
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById("loginDiv").classList.add("hidden");
-        document.getElementById("adminPanel").classList.remove("hidden");
-        loadShipments();
-      }
-    });
-  </script>
-
+  <!-- Firebase + Auth -->
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
-      </html>
-      
+</html>
