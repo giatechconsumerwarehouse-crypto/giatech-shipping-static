@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Track Your Shipment - Giatech Shipping</title>
+  <title>Giatech Shipping Tracker</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
@@ -18,39 +18,34 @@
     </div>
   </header>
 
-  <!-- Client Tracking Section -->
   <div class="container">
-    <h2>📦 Shipment Tracker</h2>
-    <p>Enter your tracking number to view shipment details.</p>
-
+    <h2>📦 Track Your Shipment</h2>
     <form id="trackForm">
-      <input type="text" id="trackId" required placeholder="Enter Tracking Number">
+      <input type="text" id="trackingId" placeholder="Enter Tracking Number" required>
       <button type="submit">Track</button>
     </form>
 
-    <div id="result" class="card" style="display:none;">
-      <h2>Shipment Details</h2>
-      <p><strong>Tracking Number:</strong> <span id="rTracking"></span></p>
+    <!-- Result Box -->
+    <div id="result" style="display:none;">
+      <h3>📋 Shipment Details</h3>
+      <p><strong>Tracking ID:</strong> <span id="rTrackingId"></span></p>
       <p><strong>Address:</strong> <span id="rAddress"></span></p>
       <p><strong>Status:</strong> <span id="rStatus"></span></p>
       <p><strong>Expected Delivery:</strong> <span id="rExpected"></span></p>
+      <p><strong>Items:</strong> <span id="rItems"></span></p>
 
-      <h3>📍 Timeline</h3>
-      <ul id="rTimeline"></ul>
-
-      <h3>📦 Package Items</h3>
-      <p id="rItems"></p>
+      <h4>📍 Timeline</h4>
+      <ul id="rTimeline" class="timeline"></ul>
     </div>
 
-    <p id="error" style="color:red;"></p>
+    <p id="error"></p>
   </div>
 
-  <!-- Firebase & Tracking Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    // ✅ Your Firebase Config
+    // ✅ Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
       authDomain: "giatech-shipping.firebaseapp.com",
@@ -70,38 +65,36 @@
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const trackId = document.getElementById("trackId").value.trim();
+      const trackingId = document.getElementById("trackingId").value.trim();
+      errorBox.textContent = "";
+      resultBox.style.display = "none";
 
       try {
-        const docRef = doc(db, "shipments", trackId);
+        const docRef = doc(db, "shipments", trackingId);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          document.getElementById("rTracking").textContent = data.trackingId;
+          document.getElementById("rTrackingId").textContent = data.trackingId;
           document.getElementById("rAddress").textContent = data.address;
           document.getElementById("rStatus").textContent = data.status;
           document.getElementById("rExpected").textContent = data.expected;
+          document.getElementById("rItems").textContent = data.items;
 
           // Timeline
           const timelineList = document.getElementById("rTimeline");
           timelineList.innerHTML = "";
-          if (Array.isArray(data.timeline)) {
-            data.timeline.forEach((t) => {
+          if (data.timeline && data.timeline.length > 0) {
+            data.timeline.forEach((step) => {
               const li = document.createElement("li");
-              li.textContent = t.trim();
+              li.textContent = step;
               timelineList.appendChild(li);
             });
           }
 
-          // Items
-          document.getElementById("rItems").textContent = data.items || "No items listed.";
-
           resultBox.style.display = "block";
-          errorBox.textContent = "";
         } else {
-          resultBox.style.display = "none";
-          errorBox.textContent = "❌ No shipment found with this tracking number.";
+          errorBox.textContent = "❌ Shipment not found. Please check your Tracking ID.";
         }
       } catch (err) {
         errorBox.textContent = "❌ Error: " + err.message;
