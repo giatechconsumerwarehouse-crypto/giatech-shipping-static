@@ -1,104 +1,131 @@
-  /* General Styles */
-body {
-  font-family: Arial, sans-serif;
-  background: #f7f9fc;
+/* Reset */
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  background: #f4f6f9;
   color: #333;
-}
-
-.container {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 25px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-h1, h2, h3 {
-  text-align: center;
-  color: #2c3e50;
-}
-
-p {
   line-height: 1.6;
 }
 
-/* Forms */
-form {
-  margin-top: 20px;
+/* ===== HEADER ===== */
+header {
+  background: linear-gradient(90deg, #0056a3, #007bff);
+  color: #fff;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-label {
-  display: block;
-  margin: 12px 0 6px;
+header .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+header .logo h1 {
+  font-size: 1.5rem;
   font-weight: bold;
+  letter-spacing: 1px;
 }
 
-input, textarea, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 6px;
-  border-radius: 8px;
+header .icon {
+  font-size: 1.8rem;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.container {
+  max-width: 600px;
+  background: #fff;
+  padding: 25px;
+  margin: 40px auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+/* Headings */
+.container h1,
+.container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #0056a3;
+}
+
+/* ===== FORMS ===== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+form input,
+form textarea {
+  padding: 12px;
   border: 1px solid #ccc;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.3s;
 }
 
-textarea {
-  resize: vertical;
+form input:focus,
+form textarea:focus {
+  border-color: #007bff;
+  outline: none;
 }
 
 button {
   background: #007bff;
   color: white;
   border: none;
+  padding: 12px;
+  border-radius: 8px;
   cursor: pointer;
-  margin-top: 15px;
-  font-size: 16px;
+  font-size: 1rem;
   transition: 0.3s;
 }
 
 button:hover {
-  background: #0056b3;
+  background: #0056a3;
 }
 
-/* Card for Results */
-.card {
-  margin-top: 25px;
-  padding: 20px;
-  border-radius: 12px;
-  background: #f0f4f8;
-  border: 1px solid #ddd;
+/* ===== TRACKING RESULTS ===== */
+#result {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 10px;
+  background: #f9f9f9;
+  border-left: 5px solid #007bff;
 }
 
-.card h3 {
-  margin-top: 15px;
-  color: #007bff;
+#result h3 {
+  margin-bottom: 10px;
+  color: #0056a3;
 }
 
 /* Timeline */
-ul {
-  list-style-type: none;
-  padding-left: 0;
-}
-
-ul li {
-  padding: 8px 10px;
-  margin: 5px 0;
-  background: #e9f1ff;
-  border-left: 5px solid #007bff;
-  border-radius: 6px;
-}
-
-/* Messages */
-#error {
-  text-align: center;
+.timeline {
   margin-top: 15px;
+  padding-left: 20px;
+}
+
+.timeline li {
+  list-style: disc;
+  margin-bottom: 8px;
+}
+
+/* ===== ALERTS ===== */
+#error {
+  color: red;
+  font-weight: bold;
 }
 
 #message {
-  text-align: center;
-  margin-top: 15px;
+  margin-top: 10px;
   font-weight: bold;
 }
