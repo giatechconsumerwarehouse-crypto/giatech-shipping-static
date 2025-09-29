@@ -132,3 +132,51 @@ footer {
     margin: 5px;
   }
 }
+/* Progress Tracker */
+.progress-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.progress-step {
+  text-align: center;
+  position: relative;
+}
+
+.step-circle {
+  width: 35px;
+  height: 35px;
+  background: #ccc;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  font-weight: bold;
+}
+
+.step-label {
+  margin-top: 8px;
+  font-size: 0.9em;
+  color: #333;
+}
+
+.progress-line {
+  width: 60px;
+  height: 4px;
+  background: #ccc;
+  margin: 0 10px;
+  align-self: center;
+}
+
+/* Active step */
+.progress-step.active .step-circle {
+  background: #004080;
+}
+
+.progress-step.active .step-label {
+  color: #004080;
+}
