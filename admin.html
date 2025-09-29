@@ -2,84 +2,114 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Dashboard - Giatech Shipping</title>
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Giatech Shipping</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1, h2 { color: #333; }
+    form { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; }
+    input, button { margin: 5px 0; padding: 8px; width: 100%; }
+    button { background: #007bff; color: white; border: none; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    #proofMessage { margin-top: 10px; font-weight: bold; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Admin Dashboard</h1>
-    <button onclick="logout()">Logout</button>
-  </header>
+  <h1>Admin Panel - Giatech Shipping</h1>
+  <button id="logoutBtn">Logout</button>
 
-  <section class="tracking-box">
-    <h2>Update Shipment</h2>
-    <form id="updateForm">
-      <input type="text" id="trackingNumber" placeholder="Tracking Number" required><br><br>
-      <select id="status">
-        <option value="1">Order Placed</option>
-        <option value="2">Processing</option>
-        <option value="3">Shipped</option>
-        <option value="4">Delivered</option>
-      </select><br><br>
-      <button type="submit">Update</button>
-    </form>
-    <p id="updateMessage"></p>
-  </section>
+  <!-- Update Shipment -->
+  <h2>Update Shipment</h2>
+  <form id="updateForm">
+    <input type="text" id="trackingNumber" placeholder="Tracking Number" required>
+    <input type="text" id="status" placeholder="Status (Processing, Shipped, Delivered)" required>
+    <button type="submit">Update Shipment</button>
+  </form>
+  <p id="updateMessage"></p>
 
-  <script>
-    // Firebase config
+  <!-- Upload Delivery Proof -->
+  <h2>Upload Delivery Proof</h2>
+  <form id="proofForm">
+    <input type="text" id="proofTrackingNumber" placeholder="Tracking Number" required>
+    <input type="file" id="proofFile" accept="image/*,.pdf" required>
+    <button type="submit">Upload Proof</button>
+  </form>
+  <p id="proofMessage"></p>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    // 🔑 Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
       authDomain: "giatech-shipping.firebaseapp.com",
       databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
       projectId: "giatech-shipping",
-      storageBucket: "giatech-shipping.firebasestorage.app",
+      storageBucket: "giatech-shipping.appspot.com",
       messagingSenderId: "906996624627",
       appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
     };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
 
-    // Protect admin page
-    auth.onAuthStateChanged(user => {
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const storage = getStorage(app);
+    const auth = getAuth(app);
+
+    // ✅ Protect admin page
+    onAuthStateChanged(auth, (user) => {
       if (!user) {
         window.location.href = "login.html";
       }
     });
 
-    // Handle update
-    document.getElementById("updateForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const trackingNumber = document.getElementById("trackingNumber").value.trim();
-      const step = parseInt(document.getElementById("status").value);
-
-      let statusText = "Order Placed";
-      if (step === 2) statusText = "Processing";
-      if (step === 3) statusText = "Shipped";
-      if (step === 4) statusText = "Delivered";
-
-      db.ref("shipments/" + trackingNumber).set({
-        status: statusText,
-        step: step
-      }).then(() => {
-        document.getElementById("updateMessage").innerText = "Shipment updated successfully!";
-      }).catch(error => {
-        document.getElementById("updateMessage").innerText = "Error: " + error.message;
-      });
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => window.location.href = "login.html");
     });
 
-    // Logout
-    function logout() {
-      auth.signOut().then(() => {
-        window.location.href = "login.html";
-      });
-    }
+    // ✅ Update Shipment
+    document.getElementById("updateForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const trackingNumber = document.getElementById("trackingNumber").value;
+      const status = document.getElementById("status").value;
+
+      try {
+        const shipmentRef = ref(db, "shipments/" + trackingNumber);
+        await update(shipmentRef, { status: status });
+        document.getElementById("updateMessage").innerText = "✅ Shipment updated!";
+      } catch (error) {
+        console.error(error);
+        document.getElementById("updateMessage").innerText = "❌ Error updating shipment.";
+      }
+    });
+
+    // ✅ Upload Delivery Proof
+    document.getElementById("proofForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const trackingNumber = document.getElementById("proofTrackingNumber").value;
+      const file = document.getElementById("proofFile").files[0];
+
+      if (!file) {
+        document.getElementById("proofMessage").innerText = "⚠️ Please select a file.";
+        return;
+      }
+
+      try {
+        const storageRef = sRef(storage, "proofs/" + trackingNumber + "_" + file.name);
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+
+        const shipmentRef = ref(db, "shipments/" + trackingNumber);
+        await update(shipmentRef, { proofURL: downloadURL });
+
+        document.getElementById("proofMessage").innerText = "✅ Proof uploaded successfully!";
+      } catch (error) {
+        console.error(error);
+        document.getElementById("proofMessage").innerText = "❌ Error uploading file.";
+      }
+    });
   </script>
 </body>
 </html>
