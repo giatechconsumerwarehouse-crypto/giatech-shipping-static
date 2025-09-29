@@ -2,58 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shipment Status - Giatech Shipping</title>
+  <title>Track Shipment - Giatech</title>
   <link rel="stylesheet" href="style.css">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 </head>
 <body>
-  <div class="status-container">
-    <h2>Shipment Status</h2>
-    <p id="statusMessage">Loading...</p>
-  </div>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">Giatech Shipping</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tracking.html">Track</a></li>
+        <li><a href="admin-login.html">Admin</a></li>
+      </ul>
+    </div>
+  </nav>
 
-  <script>
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
-      authDomain: "giatech-shipping.firebaseapp.com",
-      databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
-      projectId: "giatech-shipping",
-      storageBucket: "giatech-shipping.firebasestorage.app",
-      messagingSenderId: "906996624627",
-      appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
-    };
-
-    // Init Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    // Get tracking number from URL
-    const params = new URLSearchParams(window.location.search);
-    const trackingNumber = params.get("tracking");
-
-    const statusMessage = document.getElementById("statusMessage");
-
-    if (!trackingNumber) {
-      statusMessage.innerText = "No tracking number provided.";
-    } else {
-      db.collection("shipments").doc(trackingNumber).get()
-        .then(doc => {
-          if (doc.exists) {
-            const data = doc.data();
-            statusMessage.innerText = `Tracking Number: ${data.trackingNumber}\nStatus: ${data.status}\nUpdated At: ${new Date(data.updatedAt).toLocaleString()}`;
-          } else {
-            statusMessage.innerText = "No shipment found with this tracking number.";
-          }
-        })
-        .catch(err => {
-          statusMessage.innerText = "Error fetching shipment: " + err.message;
-        });
-    }
-  </script>
+  <!-- Tracking Section -->
+  <section class="tracking">
+    <h2>Track Your Shipment</h2>
+    <form>
+      <input type="text" placeholder="Enter Tracking Number">
+      <button type="submit">Track</button>
+    </form>
+    <div id="tracking-result"></div>
+  </section>
 </body>
 </html>
