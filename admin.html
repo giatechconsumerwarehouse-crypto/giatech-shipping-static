@@ -3,26 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - Giatech Shipping</title>
+  <title>Admin Panel - Giatech Shipping</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="admin-dashboard">
-    <h2>Admin Dashboard</h2>
-    <form id="addShipmentForm">
+  <div class="admin-container">
+    <h1>Admin Panel</h1>
+    <p>Welcome, Admin! Here you can manage shipments and update tracking.</p>
+
+    <!-- Example Tracking Form -->
+    <form id="update-form">
       <input type="text" id="trackingId" placeholder="Tracking ID" required>
-      <select id="status" required>
-        <option value="Order Placed">Order Placed</option>
-        <option value="Processing">Processing</option>
-        <option value="Shipped">Shipped</option>
-        <option value="Delivered">Delivered</option>
-      </select>
-      <button type="submit">Add / Update Shipment</button>
+      <input type="text" id="status" placeholder="Update Status" required>
+      <button type="submit">Update Tracking</button>
     </form>
-    <button id="logoutBtn">Logout</button>
+
+    <button id="logout-btn">Logout</button>
   </div>
 
-  <!-- Firebase + Auth -->
+  <!-- Firebase -->
   <script type="module" src="firebase.js"></script>
   <script type="module" src="script.js"></script>
 </body>
