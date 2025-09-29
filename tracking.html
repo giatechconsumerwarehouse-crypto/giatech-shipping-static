@@ -1,60 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Track Shipment - Giatech Shipping</title>
-  <link rel="stylesheet" href="style.css">
-  <script>
-    // Simple demo tracking (later we connect to admin updates)
-    function trackShipment(event) {
-      event.preventDefault();
-      const trackingNumber = document.getElementById("trackingNumber").value;
-      const result = document.getElementById("tracking-result");
+<script>
+  function trackShipment(event) {
+    event.preventDefault();
+    const trackingNumber = document.getElementById("trackingNumber").value;
+    const result = document.getElementById("tracking-result");
 
-      if (trackingNumber === "12345") {
-        result.innerHTML = `
-          <h3>Tracking Number: ${trackingNumber}</h3>
-          <p>Status: 🚚 In Transit</p>
-          <p>Current Location: Manila, Philippines</p>
-          <p>Estimated Delivery: 2 Days</p>
-        `;
-      } else if (trackingNumber === "67890") {
-        result.innerHTML = `
-          <h3>Tracking Number: ${trackingNumber}</h3>
-          <p>Status: ✅ Delivered</p>
-          <p>Delivered To: Quezon City</p>
-          <p>Proof of Delivery: <a href="#">View Document</a></p>
-        `;
-      } else {
-        result.innerHTML = "<p style='color:red;'>❌ Tracking number not found.</p>";
-      }
+    // Get data from localStorage
+    const shipments = JSON.parse(localStorage.getItem("shipments")) || {};
+
+    if (shipments[trackingNumber]) {
+      const s = shipments[trackingNumber];
+      result.innerHTML = `
+        <h3>Tracking Number: ${trackingNumber}</h3>
+        <p>Status: ${s.status}</p>
+        <p>Current Location: ${s.location}</p>
+        <p>ETA: ${s.eta}</p>
+      `;
+    } else {
+      result.innerHTML = "<p style='color:red;'>❌ Tracking number not found.</p>";
     }
-  </script>
-</head>
-<body>
-
-  <header>
-    <h1>📦 Giatech Shipping</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="tracking.html">Tracking</a>
-      <a href="admin.html">Admin</a>
-    </nav>
-  </header>
-
-  <div class="container">
-    <h2>📍 Track Your Shipment</h2>
-    <form onsubmit="trackShipment(event)">
-      <input type="text" id="trackingNumber" placeholder="Enter Tracking Number" required>
-      <button type="submit">Track</button>
-    </form>
-    <div id="tracking-result" style="margin-top:20px;"></div>
-  </div>
-
-  <footer>
-    <p>&copy; 2025 Giatech Shipping. All Rights Reserved.</p>
-  </footer>
-
-</body>
-</html>
+  }
+</script>
