@@ -5,43 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel - Giatech Shipping</title>
   <link rel="stylesheet" href="style.css">
-  <script>
-    // Fake database (in real site, we will connect to backend)
-    let shipments = {
-      "12345": { status: "In Transit", location: "Manila", eta: "2 Days" },
-      "67890": { status: "Delivered", location: "Quezon City", eta: "Delivered" }
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, setDoc, doc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // 🔑 Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "XXXXXXX",
+      appId: "YOUR_APP_ID"
     };
 
-    function addUpdateShipment(event) {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function addUpdateShipment(event) {
       event.preventDefault();
       const number = document.getElementById("shipNumber").value;
       const status = document.getElementById("shipStatus").value;
       const location = document.getElementById("shipLocation").value;
       const eta = document.getElementById("shipETA").value;
 
-      shipments[number] = { status, location, eta };
+      await setDoc(doc(db, "shipments", number), {
+        status, location, eta
+      });
+
       alert("✅ Shipment updated successfully!");
       document.getElementById("shipment-form").reset();
       displayShipments();
     }
 
-    function displayShipments() {
+    async function displayShipments() {
       const list = document.getElementById("shipment-list");
       list.innerHTML = "";
-      for (const number in shipments) {
-        const s = shipments[number];
+      const querySnapshot = await getDocs(collection(db, "shipments"));
+      querySnapshot.forEach((docSnap) => {
+        const s = docSnap.data();
         list.innerHTML += `
           <div class="card">
-            <h3>Tracking #${number}</h3>
+            <h3>Tracking #${docSnap.id}</h3>
             <p>Status: ${s.status}</p>
             <p>Location: ${s.location}</p>
             <p>ETA: ${s.eta}</p>
           </div>
         `;
-      }
+      });
     }
 
-    window.onload = displayShipments;
+    window.addEventListener("DOMContentLoaded", displayShipments);
+    window.addUpdateShipment = addUpdateShipment;
   </script>
 </head>
 <body>
