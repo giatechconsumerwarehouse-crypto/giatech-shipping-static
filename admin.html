@@ -5,12 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel - Giatech Shipping</title>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
     <h2>🚚 Admin Panel - Manage Shipments</h2>
+
+    <!-- Logout Button -->
+    <button onclick="logout()" style="float:right; margin-bottom:15px;">Logout</button>
+
     <form id="shipmentForm">
       <label>Tracking Number:</label>
       <input type="text" id="trackingNumber" required><br><br>
@@ -34,6 +39,7 @@
   </div>
 
   <script>
+    // ✅ Replace with your Firebase config
     const firebaseConfig = {
   apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
   authDomain: "giatech-shipping.firebaseapp.com",
@@ -44,10 +50,25 @@
   appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
 };
 
-
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.firestore();
 
+    // ✅ Redirect if not logged in
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+
+    // ✅ Logout
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = "login.html";
+      });
+    }
+
+    // ✅ Save Shipment
     document.getElementById("shipmentForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
