@@ -1,98 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Panel - Giatech Shipping</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-</head>
-<body>
-  <!-- Company Header -->
-  <header>
-    <div class="logo">
-      <span class="icon">🚢</span>
-      <span class="icon">📦</span>
-      <span class="icon">✈️</span>
-      <h1>Giatech Shipping</h1>
-    </div>
+<body class="admin-body">
+  <header class="admin-header">
+    <h1>🚢 Giatech Shipping Admin Panel</h1>
   </header>
 
-  <div class="container">
-    <h2>📋 Admin Dashboard</h2>
-    <button id="logoutBtn">🚪 Logout</button>
+  <!-- Login Form -->
+  <section id="loginSection" class="admin-card">
+    <h2>Admin Login</h2>
+    <input type="email" id="adminEmail" placeholder="Email">
+    <input type="password" id="adminPassword" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="loginMessage"></p>
+  </section>
 
-    <form id="shipmentForm">
-      <input type="text" id="trackingId" placeholder="Tracking Number" required>
-      <input type="text" id="address" placeholder="Delivery Address" required>
-      <input type="text" id="status" placeholder="Current Status" required>
-      <input type="text" id="expected" placeholder="Expected Delivery Date" required>
-      <textarea id="items" placeholder="Package Items"></textarea>
-      <textarea id="timeline" placeholder="Timeline (separate by commas)"></textarea>
-      <button type="submit">Save Shipment</button>
-    </form>
-
-    <p id="message" style="color:green;"></p>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-    import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-    // ✅ Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
-      authDomain: "giatech-shipping.firebaseapp.com",
-      databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
-      projectId: "giatech-shipping",
-      storageBucket: "giatech-shipping.firebasestorage.app",
-      messagingSenderId: "906996624627",
-      appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // ✅ Restrict access
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "admin-login.html"; // Redirect if not logged in
-      }
-    });
-
-    // ✅ Logout
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
-      await signOut(auth);
-      window.location.href = "admin-login.html";
-    });
-
-    // ✅ Save Shipment
-    const form = document.getElementById("shipmentForm");
-    const messageBox = document.getElementById("message");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const trackingId = document.getElementById("trackingId").value.trim();
-      const address = document.getElementById("address").value.trim();
-      const status = document.getElementById("status").value.trim();
-      const expected = document.getElementById("expected").value.trim();
-      const items = document.getElementById("items").value.trim();
-      const timeline = document.getElementById("timeline").value.split(",");
-
-      try {
-        await setDoc(doc(db, "shipments", trackingId), {
-          trackingId, address, status, expected, items, timeline
-        });
-        messageBox.textContent = "✅ Shipment saved successfully!";
-        form.reset();
-      } catch (err) {
-        messageBox.style.color = "red";
-        messageBox.textContent = "❌ Error: " + err.message;
-      }
-    });
-  </script>
+  <!-- Dashboard -->
+  <section id="dashboard" class="admin-card" style="display:none;">
+    <h2>Update Shipment</h2>
+    <input type="text" id="trackingId" placeholder="Tracking ID">
+    <input type="text" id="location" placeholder="Current Location">
+    <select id="status">
+      <option>Order Placed</option>
+      <option>Processing</option>
+      <option>Shipped</option>
+      <option>Delivered</option>
+    </select>
+    <button onclick="updateShipment()">Update</button>
+    <p id="updateMessage"></p>
+  </section>
 </body>
-</html>
