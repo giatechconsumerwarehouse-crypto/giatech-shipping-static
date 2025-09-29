@@ -2,44 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel - Giatech Shipping</title>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+  <title>Admin Dashboard - Giatech Shipping</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 </head>
 <body>
   <div class="container">
-    <h2>🚚 Admin Panel - Manage Shipments</h2>
-
-    <!-- Logout Button -->
-    <button onclick="logout()" style="float:right; margin-bottom:15px;">Logout</button>
+    <h2>Admin Dashboard</h2>
+    <button id="logout">Logout</button>
 
     <form id="shipmentForm">
-      <label>Tracking Number:</label>
-      <input type="text" id="trackingNumber" required><br><br>
+      <h3>Add / Update Shipment</h3>
 
-      <label>Status:</label>
-      <input type="text" id="status" required><br><br>
+      <label for="trackingId">Tracking Number</label>
+      <input type="text" id="trackingId" required placeholder="e.g. #WTR23233234">
 
-      <label>Destination:</label>
-      <input type="text" id="destination" required><br><br>
+      <label for="address">Shipping Address</label>
+      <input type="text" id="address" required placeholder="123 Main Street, City">
 
-      <label>Last Updated:</label>
-      <input type="date" id="lastUpdated" required><br><br>
+      <label for="status">Current Status</label>
+      <input type="text" id="status" required placeholder="e.g. Out for Delivery">
 
-      <label>Proof of Delivery Note:</label>
-      <input type="text" id="proofNote"><br><br>
+      <label for="expected">Expected Delivery</label>
+      <input type="text" id="expected" placeholder="e.g. Dec 21 - Dec 31">
+
+      <label for="timeline">Timeline (comma separated)</label>
+      <textarea id="timeline" rows="4" placeholder="e.g. Dec 20: Departed Facility, Dec 21: Out for Delivery, Dec 22: Delivered"></textarea>
+
+      <label for="items">Package Contents</label>
+      <input type="text" id="items" placeholder="e.g. Adidas Sneakers x1">
 
       <button type="submit">Save Shipment</button>
     </form>
 
-    <p id="message"></p>
+    <p id="message" style="color:green;"></p>
   </div>
 
-  <script>
-    // ✅ Replace with your Firebase config
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    // Firebase Config (replace with YOUR details)
+    const firebaseConfig = {
     const firebaseConfig = {
   apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
   authDomain: "giatech-shipping.firebaseapp.com",
@@ -50,46 +57,52 @@
   appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
 };
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // ✅ Redirect if not logged in
-    auth.onAuthStateChanged(user => {
+    // Protect this page - redirect if not logged in
+    onAuthStateChanged(auth, (user) => {
       if (!user) {
-        window.location.href = "login.html";
+        window.location.href = "admin-login.html";
       }
     });
 
-    // ✅ Logout
-    function logout() {
-      auth.signOut().then(() => {
-        window.location.href = "login.html";
+    // Logout
+    document.getElementById("logout").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "admin-login.html";
       });
-    }
+    });
 
-    // ✅ Save Shipment
-    document.getElementById("shipmentForm").addEventListener("submit", async (e) => {
+    // Save Shipment
+    const form = document.getElementById("shipmentForm");
+    const msg = document.getElementById("message");
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const trackingNumber = document.getElementById("trackingNumber").value.trim();
-      const status = document.getElementById("status").value.trim();
-      const destination = document.getElementById("destination").value.trim();
-      const lastUpdated = document.getElementById("lastUpdated").value;
-      const proofNote = document.getElementById("proofNote").value.trim();
+      const trackingId = document.getElementById("trackingId").value;
+      const address = document.getElementById("address").value;
+      const status = document.getElementById("status").value;
+      const expected = document.getElementById("expected").value;
+      const timeline = document.getElementById("timeline").value.split(",");
+      const items = document.getElementById("items").value;
 
       try {
-        await db.collection("shipments").doc(trackingNumber).set({
-          trackingNumber,
+        await setDoc(doc(db, "shipments", trackingId), {
+          trackingId,
+          address,
           status,
-          destination,
-          lastUpdated,
-          proofNote
+          expected,
+          timeline,
+          items
         });
-        document.getElementById("message").innerHTML = "<span style='color:green;'>Shipment saved successfully ✅</span>";
-        e.target.reset();
-      } catch (error) {
-        document.getElementById("message").innerHTML = "<span style='color:red;'>Error: " + error.message + "</span>";
+
+        msg.textContent = "✅ Shipment saved successfully!";
+        form.reset();
+      } catch (err) {
+        msg.textContent = "❌ Error: " + err.message;
       }
     });
   </script>
