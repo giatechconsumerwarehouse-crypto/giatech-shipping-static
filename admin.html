@@ -1,29 +1,85 @@
-<body class="admin-body">
-  <header class="admin-header">
-    <h1>🚢 Giatech Shipping Admin Panel</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - Giatech Shipping</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard</h1>
+    <button onclick="logout()">Logout</button>
   </header>
 
-  <!-- Login Form -->
-  <section id="loginSection" class="admin-card">
-    <h2>Admin Login</h2>
-    <input type="email" id="adminEmail" placeholder="Email">
-    <input type="password" id="adminPassword" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <p id="loginMessage"></p>
-  </section>
-
-  <!-- Dashboard -->
-  <section id="dashboard" class="admin-card" style="display:none;">
+  <section class="tracking-box">
     <h2>Update Shipment</h2>
-    <input type="text" id="trackingId" placeholder="Tracking ID">
-    <input type="text" id="location" placeholder="Current Location">
-    <select id="status">
-      <option>Order Placed</option>
-      <option>Processing</option>
-      <option>Shipped</option>
-      <option>Delivered</option>
-    </select>
-    <button onclick="updateShipment()">Update</button>
+    <form id="updateForm">
+      <input type="text" id="trackingNumber" placeholder="Tracking Number" required><br><br>
+      <select id="status">
+        <option value="1">Order Placed</option>
+        <option value="2">Processing</option>
+        <option value="3">Shipped</option>
+        <option value="4">Delivered</option>
+      </select><br><br>
+      <button type="submit">Update</button>
+    </form>
     <p id="updateMessage"></p>
   </section>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
+      authDomain: "giatech-shipping.firebaseapp.com",
+      databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
+      projectId: "giatech-shipping",
+      storageBucket: "giatech-shipping.firebasestorage.app",
+      messagingSenderId: "906996624627",
+      appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // Protect admin page
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+
+    // Handle update
+    document.getElementById("updateForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const trackingNumber = document.getElementById("trackingNumber").value.trim();
+      const step = parseInt(document.getElementById("status").value);
+
+      let statusText = "Order Placed";
+      if (step === 2) statusText = "Processing";
+      if (step === 3) statusText = "Shipped";
+      if (step === 4) statusText = "Delivered";
+
+      db.ref("shipments/" + trackingNumber).set({
+        status: statusText,
+        step: step
+      }).then(() => {
+        document.getElementById("updateMessage").innerText = "Shipment updated successfully!";
+      }).catch(error => {
+        document.getElementById("updateMessage").innerText = "Error: " + error.message;
+      });
+    });
+
+    // Logout
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = "login.html";
+      });
+    }
+  </script>
 </body>
+</html>
