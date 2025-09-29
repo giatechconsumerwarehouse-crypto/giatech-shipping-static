@@ -2,69 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Giatech Shipping Tracker</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giatech Shipping</title>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 </head>
 <body>
   <!-- Company Header -->
   <header>
     <div class="logo">
-      <span class="icon">🚢</span>
-      <span class="icon">📦</span>
-      <span class="icon">✈️</span>
+      🚢 ✈️ 📦
       <h1>Giatech Shipping</h1>
     </div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="tracking.html">Track Order</a>
+      <a href="login.html">Admin</a>
+    </nav>
   </header>
 
-  <div class="container">
-    <h2>📦 Track Your Shipment</h2>
-    <form id="trackForm">
-      <input type="text" id="trackingId" placeholder="Enter Tracking Number" required>
+  <!-- Hero Section -->
+  <section class="hero">
+    <h2>Fast • Reliable • Secure</h2>
+    <p>Track your shipments worldwide with Giatech Shipping</p>
+  </section>
+
+  <!-- Tracking Box -->
+  <section class="tracking-box">
+    <h3>Track Your Shipment</h3>
+    <form id="trackingForm">
+      <input type="text" id="trackingNumber" placeholder="Enter Tracking Number" required>
       <button type="submit">Track</button>
     </form>
+    <div id="trackingResult"></div>
+  </section>
 
-    <!-- Result Box -->
-    <div id="result" style="display:none;">
-    // Define steps
-const steps = ["Order Placed", "Processing", "Shipped", "Delivered"];
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Giatech Shipping. All rights reserved.</p>
+  </footer>
 
-// Find current step index
-const currentStep = steps.indexOf(data.status);
-
-let progressHTML = `<h3>Shipment Progress</h3>
-<div class="progress-container">`;
-
-steps.forEach((step, index) => {
-  const active = index <= currentStep ? "active" : "";
-  progressHTML += `
-    <div class="progress-step ${active}">
-      <div class="step-circle">${index + 1}</div>
-      <div class="step-label">${step}</div>
-    </div>
-    ${index < steps.length - 1 ? `<div class="progress-line ${active}"></div>` : ""}
-  `;
-});
-
-progressHTML += `</div>
-<p><b>Location:</b> ${data.location}</p>
-<p><b>Last Update:</b> ${data.updated}</p>`;
-
-resultDiv.innerHTML = progressHTML;
-
-      <h4>📍 Timeline</h4>
-      <ul id="rTimeline" class="timeline"></ul>
-    </div>
-
-    <p id="error"></p>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-    // ✅ Firebase Config
+  <!-- Firebase Config -->
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
       authDomain: "giatech-shipping.firebaseapp.com",
@@ -74,51 +59,7 @@ resultDiv.innerHTML = progressHTML;
       messagingSenderId: "906996624627",
       appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
     };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const form = document.getElementById("trackForm");
-    const resultBox = document.getElementById("result");
-    const errorBox = document.getElementById("error");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const trackingId = document.getElementById("trackingId").value.trim();
-      errorBox.textContent = "";
-      resultBox.style.display = "none";
-
-      try {
-        const docRef = doc(db, "shipments", trackingId);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          document.getElementById("rTrackingId").textContent = data.trackingId;
-          document.getElementById("rAddress").textContent = data.address;
-          document.getElementById("rStatus").textContent = data.status;
-          document.getElementById("rExpected").textContent = data.expected;
-          document.getElementById("rItems").textContent = data.items;
-
-          // Timeline
-          const timelineList = document.getElementById("rTimeline");
-          timelineList.innerHTML = "";
-          if (data.timeline && data.timeline.length > 0) {
-            data.timeline.forEach((step) => {
-              const li = document.createElement("li");
-              li.textContent = step;
-              timelineList.appendChild(li);
-            });
-          }
-
-          resultBox.style.display = "block";
-        } else {
-          errorBox.textContent = "❌ Shipment not found. Please check your Tracking ID.";
-        }
-      } catch (err) {
-        errorBox.textContent = "❌ Error: " + err.message;
-      }
-    });
+    firebase.initializeApp(firebaseConfig);
   </script>
 </body>
 </html>
