@@ -1,22 +1,78 @@
-<script>
-  function trackShipment(event) {
-    event.preventDefault();
-    const trackingNumber = document.getElementById("trackingNumber").value;
-    const result = document.getElementById("tracking-result");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Shipment - Giatech Shipping</title>
+  <link rel="stylesheet" href="style.css">
 
-    // Get data from localStorage
-    const shipments = JSON.parse(localStorage.getItem("shipments")) || {};
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, getDoc, doc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    if (shipments[trackingNumber]) {
-      const s = shipments[trackingNumber];
-      result.innerHTML = `
-        <h3>Tracking Number: ${trackingNumber}</h3>
-        <p>Status: ${s.status}</p>
-        <p>Current Location: ${s.location}</p>
-        <p>ETA: ${s.eta}</p>
-      `;
-    } else {
-      result.innerHTML = "<p style='color:red;'>❌ Tracking number not found.</p>";
+    // 🔑 Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "XXXXXXX",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function trackShipment(event) {
+      event.preventDefault();
+      const trackingNumber = document.getElementById("trackingNumber").value;
+      const result = document.getElementById("tracking-result");
+
+      const docRef = doc(db, "shipments", trackingNumber);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const s = docSnap.data();
+        result.innerHTML = `
+          <h3>Tracking Number: ${trackingNumber}</h3>
+          <p>Status: ${s.status}</p>
+          <p>Current Location: ${s.location}</p>
+          <p>ETA: ${s.eta}</p>
+        `;
+      } else {
+        result.innerHTML = "<p style='color:red;'>❌ Tracking number not found.</p>";
+      }
     }
-  }
-</script>
+
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("track-form").addEventListener("submit", trackShipment);
+    });
+  </script>
+</head>
+<body>
+
+  <header>
+    <h1>📦 Giatech Shipping</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="tracking.html">Tracking</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2>📍 Track Your Shipment</h2>
+    <form id="track-form">
+      <input type="text" id="trackingNumber" placeholder="Enter Tracking Number" required>
+      <button type="submit">Track</button>
+    </form>
+    <div id="tracking-result" style="margin-top:20px;"></div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Giatech Shipping. All Rights Reserved.</p>
+  </footer>
+
+</body>
+</html>
