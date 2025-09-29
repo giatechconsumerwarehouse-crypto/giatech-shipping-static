@@ -190,3 +190,49 @@ button {
   background-color: #007bff;
   color: white;
   }
+/* Progress Tracker */
+.progress-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.progress-step {
+  text-align: center;
+  position: relative;
+}
+
+.step-circle {
+  width: 35px;
+  height: 35px;
+  background: #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  font-weight: bold;
+}
+
+.step-label {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.progress-line {
+  width: 50px;
+  height: 3px;
+  background: #ddd;
+  margin: 0 10px;
+}
+
+.progress-step.active .step-circle {
+  background: #28a745;
+  color: white;
+}
+
+.progress-step.active .step-label {
+  color: #28a745;
+  font-weight: bold;
+}
