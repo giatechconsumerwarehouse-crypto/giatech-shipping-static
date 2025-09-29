@@ -1,9 +1,15 @@
-import { auth } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+import {
+  ref,
+  set,
+  update
+} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 // ---------- LOGIN LOGIC ----------
 const loginForm = document.getElementById("login-form");
@@ -46,3 +52,27 @@ if (window.location.pathname.includes("admin.html")) {
     }
   });
 }
+
+// ---------- UPDATE TRACKING (Admin Panel) ----------
+const updateForm = document.getElementById("update-form");
+if (updateForm) {
+  updateForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const trackingId = document.getElementById("trackingId").value;
+    const status = document.getElementById("status").value;
+
+    try {
+      // Write/update shipment status in Firebase
+      const shipmentRef = ref(db, "shipments/" + trackingId);
+      await update(shipmentRef, {
+        status: status,
+        updatedAt: new Date().toISOString()
+      });
+
+      alert("Tracking updated ✅");
+      updateForm.reset();
+    } catch (error) {
+      alert("Error updating tracking ❌ " + error.message);
+    }
+  });
+      }
