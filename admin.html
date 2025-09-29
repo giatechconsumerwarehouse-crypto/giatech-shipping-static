@@ -2,38 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Dashboard - Giatech Shipping</title>
+  <title>Admin Panel - Giatech Shipping</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 </head>
 <body>
+  <!-- Company Header -->
+  <header>
+    <div class="logo">
+      <span class="icon">🚢</span>
+      <span class="icon">📦</span>
+      <span class="icon">✈️</span>
+      <h1>Giatech Shipping</h1>
+    </div>
+  </header>
+
   <div class="container">
-    <h2>Admin Dashboard</h2>
-    <button id="logout">Logout</button>
+    <h2>📋 Admin Dashboard</h2>
+    <button id="logoutBtn">🚪 Logout</button>
 
     <form id="shipmentForm">
-      <h3>Add / Update Shipment</h3>
-
-      <label for="trackingId">Tracking Number</label>
-      <input type="text" id="trackingId" required placeholder="e.g. #WTR23233234">
-
-      <label for="address">Shipping Address</label>
-      <input type="text" id="address" required placeholder="123 Main Street, City">
-
-      <label for="status">Current Status</label>
-      <input type="text" id="status" required placeholder="e.g. Out for Delivery">
-
-      <label for="expected">Expected Delivery</label>
-      <input type="text" id="expected" placeholder="e.g. Dec 21 - Dec 31">
-
-      <label for="timeline">Timeline (comma separated)</label>
-      <textarea id="timeline" rows="4" placeholder="e.g. Dec 20: Departed Facility, Dec 21: Out for Delivery, Dec 22: Delivered"></textarea>
-
-      <label for="items">Package Contents</label>
-      <input type="text" id="items" placeholder="e.g. Adidas Sneakers x1">
-
+      <input type="text" id="trackingId" placeholder="Tracking Number" required>
+      <input type="text" id="address" placeholder="Delivery Address" required>
+      <input type="text" id="status" placeholder="Current Status" required>
+      <input type="text" id="expected" placeholder="Expected Delivery Date" required>
+      <textarea id="items" placeholder="Package Items"></textarea>
+      <textarea id="timeline" placeholder="Timeline (separate by commas)"></textarea>
       <button type="submit">Save Shipment</button>
     </form>
 
@@ -43,65 +39,58 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    // Firebase Config (replace with YOUR details)
+    // ✅ Firebase Config
     const firebaseConfig = {
-  apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
-  authDomain: "giatech-shipping.firebaseapp.com",
-  databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
-  projectId: "giatech-shipping",
-  storageBucket: "giatech-shipping.firebasestorage.app",
-  messagingSenderId: "906996624627",
-  appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
-};
+      apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
+      authDomain: "giatech-shipping.firebaseapp.com",
+      databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
+      projectId: "giatech-shipping",
+      storageBucket: "giatech-shipping.firebasestorage.app",
+      messagingSenderId: "906996624627",
+      appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Protect this page - redirect if not logged in
+    // ✅ Restrict access
     onAuthStateChanged(auth, (user) => {
       if (!user) {
-        window.location.href = "admin-login.html";
+        window.location.href = "admin-login.html"; // Redirect if not logged in
       }
     });
 
-    // Logout
-    document.getElementById("logout").addEventListener("click", () => {
-      signOut(auth).then(() => {
-        window.location.href = "admin-login.html";
-      });
+    // ✅ Logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "admin-login.html";
     });
 
-    // Save Shipment
+    // ✅ Save Shipment
     const form = document.getElementById("shipmentForm");
-    const msg = document.getElementById("message");
+    const messageBox = document.getElementById("message");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-
-      const trackingId = document.getElementById("trackingId").value;
-      const address = document.getElementById("address").value;
-      const status = document.getElementById("status").value;
-      const expected = document.getElementById("expected").value;
+      const trackingId = document.getElementById("trackingId").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const status = document.getElementById("status").value.trim();
+      const expected = document.getElementById("expected").value.trim();
+      const items = document.getElementById("items").value.trim();
       const timeline = document.getElementById("timeline").value.split(",");
-      const items = document.getElementById("items").value;
 
       try {
         await setDoc(doc(db, "shipments", trackingId), {
-          trackingId,
-          address,
-          status,
-          expected,
-          timeline,
-          items
+          trackingId, address, status, expected, items, timeline
         });
-
-        msg.textContent = "✅ Shipment saved successfully!";
+        messageBox.textContent = "✅ Shipment saved successfully!";
         form.reset();
       } catch (err) {
-        msg.textContent = "❌ Error: " + err.message;
+        messageBox.style.color = "red";
+        messageBox.textContent = "❌ Error: " + err.message;
       }
     });
   </script>
