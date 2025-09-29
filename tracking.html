@@ -2,119 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Track Shipment</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f9f9f9; }
-    .container {
-      max-width: 500px;
-      margin: 60px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    input {
-      width: 80%;
-      padding: 12px;
-      margin: 12px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    button {
-      background: #0073ff;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    button:hover { background: #0056cc; }
-    .result {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      background: #f1f1f1;
-      text-align: left;
-    }
-    .error { color: red; margin-top: 10px; }
-  </style>
+  <title>Tracking - Giatech Shipping</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <h1>📦 Track Your Shipment</h1>
-    <input type="text" id="trackingNumber" placeholder="Enter Tracking Number">
-    <br>
-    <button onclick="trackShipment()">Track</button>
-    <div id="result" class="result"></div>
-    <p id="error" class="error"></p>
-  </div>
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <span class="icon">🚢</span>
+      <span class="icon">📦</span>
+      <span class="icon">✈️</span>
+      <h1>Giatech Shipping</h1>
+    </div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="tracking.html">Track Shipment</a>
+    </nav>
+  </header>
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  <!-- Tracking Section -->
+  <section class="tracking-box">
+    <h2>Shipment Status</h2>
+    <div class="progress-container">
+      <div class="progress-step active">
+        <div class="step-circle">1</div>
+        <div class="step-label">Order Placed</div>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step">
+        <div class="step-circle">2</div>
+        <div class="step-label">Processing</div>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step">
+        <div class="step-circle">3</div>
+        <div class="step-label">Shipped</div>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step">
+        <div class="step-circle">4</div>
+        <div class="step-label">Delivered</div>
+      </div>
+    </div>
+  </section>
 
-    //const firebaseConfig = {
-  apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
-  authDomain: "giatech-shipping.firebaseapp.com",
-  databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
-  projectId: "giatech-shipping",
-  storageBucket: "giatech-shipping.firebasestorage.app",
-  messagingSenderId: "906996624627",
-  appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
-};
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Track Shipment function
-    async function trackShipment() {
-      const trackingNumber = document.getElementById("trackingNumber").value.trim();
-      const resultDiv = document.getElementById("result");
-      const errorDiv = document.getElementById("error");
-
-      resultDiv.innerHTML = "";
-      errorDiv.textContent = "";
-
-      if (!trackingNumber) {
-        errorDiv.textContent = "⚠️ Please enter a tracking number.";
-        return;
-      }
-
-      try {
-        console.log("Searching for:", trackingNumber);
-        const shipmentsRef = collection(db, "shipments");
-        const q = query(shipmentsRef, where("trackingNumber", "==", trackingNumber));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-          errorDiv.textContent = "❌ No shipment found for this tracking number.";
-          return;
-        }
-
-        .then((doc) => {
-  if (doc.exists) {
-    const data = doc.data();
-    resultDiv.innerHTML = `
-      <h3>Shipment Found</h3>
-      <p><strong>Status:</strong> ${data.status}</p>
-      <p><strong>Destination:</strong> ${data.destination}</p>
-      <p><strong>Last Updated:</strong> ${data.lastUpdated}</p>
-      <p><strong>Proof of Delivery:</strong> ${data.proofNote || "Not available yet"}</p>
-    `;
-  } else {
-    resultDiv.innerHTML = `<p style="color:red;">Shipment not found</p>`;
-  }
-})
-
-      }
-    }
-    window.trackShipment = trackShipment;
-  </script>
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Giatech Shipping. All rights reserved.</p>
+  </footer>
 </body>
 </html>
