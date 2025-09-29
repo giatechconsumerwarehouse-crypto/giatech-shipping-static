@@ -1,36 +1,46 @@
-import { db } from "./firebase.js";
-import {
-  ref,
-  onValue
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+// Import Firebase
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { app } from "./scripts/firebase.js";
 
-const trackForm = document.getElementById("track-form");
-const resultBox = document.getElementById("tracking-result");
+const db = getDatabase(app);
 
-if (trackForm) {
-  trackForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const trackId = document.getElementById("trackId").value;
+// Function to track order
+document.getElementById("trackForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const trackingId = document.getElementById("trackingId").value;
 
-    if (!trackId) {
-      alert("Please enter a tracking ID");
-      return;
-    }
+  const snapshot = await get(ref(db, "tracking/" + trackingId));
+  if (snapshot.exists()) {
+    const data = snapshot.val();
 
-    const shipmentRef = ref(db, "shipments/" + trackId);
+    // Fill result
+    document.getElementById("res-id").innerText = trackingId;
+    document.getElementById("res-updated").innerText = new Date(data.updatedAt).toLocaleString();
+    document.getElementById("result").style.display = "block";
 
-    // Listen for real-time updates
-    onValue(shipmentRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        resultBox.innerHTML = `
-          <h2>Tracking ID: ${trackId}</h2>
-          <p><strong>Status:</strong> ${data.status}</p>
-          <p><strong>Last Updated:</strong> ${new Date(data.updatedAt).toLocaleString()}</p>
-        `;
-      } else {
-        resultBox.innerHTML = `<p style="color:red;">No shipment found with this Tracking ID ❌</p>`;
-      }
-    });
-  });
+    // Reset all steps
+    resetSteps();
+
+    // Activate steps based on status
+    if (data.status === "Order Placed") activateStep(1);
+    if (data.status === "Processing") activateStep(2);
+    if (data.status === "Shipped") activateStep(3);
+    if (data.status === "Delivered") activateStep(4);
+  } else {
+    alert("Tracking ID not found");
+  }
+});
+
+// Reset steps
+function resetSteps() {
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`step-${i}`).classList.remove("active");
+  }
+}
+
+// Activate step
+function activateStep(stepNumber) {
+  for (let i = 1; i <= stepNumber; i++) {
+    document.getElementById(`step-${i}`).classList.add("active");
+  }
 }
