@@ -1,119 +1,134 @@
-.progress-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 30px auto;
-  width: 90%;
-  max-width: 600px;
-}
-
-.progress-step {
-  text-align: center;
-  position: relative;
-  flex: 1;
-}
-
-.step-circle {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #ccc;
-  color: white;
-  line-height: 30px;
-  margin: 0 auto;
-  font-weight: bold;
-}
-
-.progress-step.active .step-circle {
-  background: #0066cc;
-}
-
-.progress-line {
-  flex: 1;
-  height: 4px;
-  background: #ccc;
-  margin: 0 10px;
-}
-
-.progress-line.active {
-  background: #0066cc;
-}
-
-.step-label {
-  margin-top: 8px;
-  font-size: 14px;
-  color: #333;
-}
-
-/* ==========================
-   Admin Panel Styling
-========================== */
-.admin-body {
-  background: #121212;
-  color: #eee;
-  font-family: Arial, sans-serif;
+/* Reset & Base */
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: #f4f7fb;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Header */
+header {
+  background: #004080;
+  color: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header .logo {
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+header nav a {
+  color: white;
+  margin-left: 20px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+header nav a:hover {
+  text-decoration: underline;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  padding: 50px 20px;
+  background: linear-gradient(135deg, #007bff, #00c4ff);
+  color: white;
+}
+
+.hero h2 {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1.2em;
+}
+
+/* Tracking Box */
+.tracking-box {
+  max-width: 500px;
+  background: white;
+  margin: 30px auto;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   text-align: center;
 }
 
-.admin-header {
-  background: #1f1f1f;
-  color: #4da6ff;
-  padding: 20px;
-  font-size: 20px;
-  font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+.tracking-box h3 {
+  margin-bottom: 15px;
+  color: #004080;
 }
 
-.admin-card {
-  background: #1e1e1e;
-  border-radius: 10px;
-  padding: 20px;
-  margin: 40px auto;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-}
-
-.admin-card h2 {
-  color: #4da6ff;
-}
-
-.admin-card input,
-.admin-card select {
-  width: 90%;
-  padding: 12px;
-  margin: 10px 0;
-  border: none;
+.tracking-box input {
+  padding: 10px;
+  width: 70%;
+  border: 1px solid #ccc;
   border-radius: 5px;
+  margin-right: 10px;
 }
 
-.admin-card input {
-  background: #2c2c2c;
-  color: #fff;
-}
-
-.admin-card select {
-  background: #2c2c2c;
-  color: #fff;
-}
-
-.admin-card button {
-  padding: 12px 20px;
-  background: #4da6ff;
+.tracking-box button {
+  padding: 10px 15px;
+  background: #004080;
+  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.tracking-box button:hover {
+  background: #0066cc;
+}
+
+#trackingResult {
+  margin-top: 15px;
+  font-size: 1em;
+  color: #333;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 15px;
+  background: #004080;
   color: white;
-  font-weight: bold;
+  margin-top: 30px;
+  font-size: 0.9em;
 }
 
-.admin-card button:hover {
-  background: #1a75ff;
-}
+/* Responsive */
+@media (max-width: 600px) {
+  .tracking-box input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
 
-#updateMessage, #loginMessage {
-  margin-top: 10px;
-  font-size: 14px;
+  .tracking-box button {
+    width: 100%;
+  }
+
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  header nav a {
+    display: inline-block;
+    margin: 5px;
+  }
 }
