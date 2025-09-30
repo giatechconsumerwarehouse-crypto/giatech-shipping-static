@@ -1,81 +1,30 @@
-// Import Firebase
-import { db } from "./firebase.js";
-import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+// tracking.js
 
-const form = document.getElementById("trackingForm");
-const resultBox = document.getElementById("trackingResult");
+// Function to initialize Google Map
+function initMap() {
+  // Default location: Manila, Philippines
+  const defaultLocation = { lat: 14.5995, lng: 120.9842 };
 
-let map;
-let marker;
-
-// Handle tracking form submit
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const trackingId = document.getElementById("trackingIdInput").value.trim();
-  if (!trackingId) return;
-
-  // Reference to shipment in Firebase
-  const shipmentRef = ref(db, "shipments/" + trackingId);
-
-  // Listen for live updates
-  onValue(shipmentRef, (snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-
-      // Update shipment info
-      document.getElementById("customerName").innerText = data.customerName || "N/A";
-      document.getElementById("currentLocation").innerText = data.location || "N/A";
-      document.getElementById("currentStatus").innerText = data.status || "N/A";
-      document.getElementById("lastUpdated").innerText = data.lastUpdated
-        ? new Date(data.lastUpdated).toLocaleString()
-        : "N/A";
-
-      // Show box
-      resultBox.style.display = "block";
-
-      // Update progress bar
-      updateProgress(data.status);
-
-      // Update Google Maps if location is available
-      if (data.lat && data.lng) {
-        updateMap(data.lat, data.lng);
-      }
-    } else {
-      alert("No shipment found with Tracking ID: " + trackingId);
-    }
+  // Create the map centered on default location
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 12,
+    center: defaultLocation,
   });
-});
 
-// Function to highlight progress bar
-function updateProgress(status) {
-  const steps = ["Order Placed", "Processing", "Shipped", "Delivered"];
-  steps.forEach((step, index) => {
-    const element = document.getElementById("step" + (index + 1));
-    if (steps.indexOf(status) >= index) {
-      element.classList.add("active");
-    } else {
-      element.classList.remove("active");
-    }
+  // Create marker at the default location
+  const marker = new google.maps.Marker({
+    position: defaultLocation,
+    map: map,
+    title: "Shipment Location",
   });
+
+  // Example static update (for testing, later replaced by Firebase live data)
+  setTimeout(() => {
+    const newLocation = { lat: 14.6760, lng: 121.0437 }; // Quezon City
+    marker.setPosition(newLocation);
+    map.setCenter(newLocation);
+  }, 5000); // moves after 5 seconds
 }
 
-// Initialize or update Google Map
-function updateMap(lat, lng) {
-  const location = { lat: parseFloat(lat), lng: parseFloat(lng) };
-
-  if (!map) {
-    map = new google.maps.Map(document.getElementById("map"), {
-      center: location,
-      zoom: 12,
-    });
-    marker = new google.maps.Marker({
-      position: location,
-      map: map,
-    });
-  } else {
-    map.setCenter(location);
-    marker.setPosition(location);
-  }
-}
-  
+// Load map when window finishes loading
+window.onload = initMap;
