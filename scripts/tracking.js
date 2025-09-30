@@ -1,80 +1,46 @@
-// ✅ Import Firebase tools
-import { ref, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+// scripts/tracking.js
 import { db } from "./firebase.js";
+import { ref, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// ✅ Function to handle tracking search
-window.trackShipment = async function () {
-  const trackingNumber = document.getElementById("trackingNumber").value.trim();
+const trackBtn = document.getElementById("trackBtn");
+const trackingInput = document.getElementById("trackingNumber");
+const trackingResult = document.getElementById("trackingResult");
+
+trackBtn.addEventListener("click", () => {
+  const trackingNumber = trackingInput.value.trim();
 
   if (!trackingNumber) {
-    alert("⚠️ Please enter a tracking number.");
+    trackingResult.innerHTML = "<p class='error'>⚠️ Please enter a tracking number.</p>";
     return;
   }
 
-  try {
-    // Reference to Firebase DB
-    const dbRef = ref(db);
+  const dbRef = ref(db);
 
-    // Get shipment data
-    const snapshot = await get(child(dbRef, `shipments/${trackingNumber}`));
+  get(child(dbRef, `shipments/${trackingNumber}`))
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        const shipment = snapshot.val();
 
-    if (snapshot.exists()) {
-      const data = snapshot.val();
+        let resultHTML = `
+          <h3>Shipment Details</h3>
+          <p><strong>Tracking Number:</strong> ${trackingNumber}</p>
+          <p><strong>Client Name:</strong> ${shipment.clientName || "N/A"}</p>
+          <p><strong>Origin:</strong> ${shipment.origin || "N/A"}</p>
+          <p><strong>Destination:</strong> ${shipment.destination || "N/A"}</p>
+          <p><strong>Status:</strong> ${shipment.status}</p>
+          <p><strong>Last Updated:</strong> ${shipment.lastUpdated || "N/A"}</p>
+        `;
 
-      // Show progress bar + details
-      document.getElementById("progressContainer").style.display = "flex";
-      document.getElementById("shipmentDetails").style.display = "block";
+        if (shipment.stopped) {
+          resultHTML += `<p class="stopped">⚠️ This shipment has been stopped by admin.</p>`;
+        }
 
-      // ✅ Update details
-      document.getElementById("detailTrackingNumber").textContent = trackingNumber;
-      document.getElementById("detailStatus").textContent = data.status || "Unknown";
-      document.getElementById("detailLocation").textContent = data.location || "Not available";
-      document.getElementById("detailUpdated").textContent = data.updatedAt || "N/A";
-
-      // ✅ Update progress bar steps
-      updateProgressBar(data.status);
-
-    } else {
-      alert("❌ Tracking number not found. Please check again.");
-      document.getElementById("progressContainer").style.display = "none";
-      document.getElementById("shipmentDetails").style.display = "none";
-    }
-
-  } catch (error) {
-    console.error("Error fetching shipment:", error);
-    alert("⚠️ Error loading shipment details.");
-  }
-};
-
-// ✅ Function to highlight progress bar
-function updateProgressBar(status) {
-  // Reset all steps
-  const steps = ["step1", "step2", "step3", "step4"];
-  steps.forEach(step => {
-    document.getElementById(step).classList.remove("active");
-  });
-
-  // Map statuses to step numbers
-  let stepIndex = 0;
-  switch (status?.toLowerCase()) {
-    case "order placed":
-      stepIndex = 1;
-      break;
-    case "processing":
-      stepIndex = 2;
-      break;
-    case "shipped":
-      stepIndex = 3;
-      break;
-    case "delivered":
-      stepIndex = 4;
-      break;
-    default:
-      stepIndex = 1;
-  }
-
-  // Activate steps up to current
-  for (let i = 1; i <= stepIndex; i++) {
-    document.getElementById(`step${i}`).classList.add("active");
-  }
-}
+        trackingResult.innerHTML = resultHTML;
+      } else {
+        trackingResult.innerHTML = "<p class='error'>❌ Tracking number not found.</p>";
+      }
+    })
+    .catch((error) => {
+      trackingResult.innerHTML = `<p class='error'>Error fetching data: ${error.message}</p>`;
+    });
+});
