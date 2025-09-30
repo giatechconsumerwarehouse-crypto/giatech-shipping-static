@@ -1,46 +1,76 @@
-// scripts/tracking.js
-import { db } from "./firebase.js";
-import { ref, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { ref, get, child } from "./scripts/firebase.js";
 
-const trackBtn = document.getElementById("trackBtn");
-const trackingInput = document.getElementById("trackingNumber");
-const trackingResult = document.getElementById("trackingResult");
+// Function to track shipment
+window.trackShipment = async function () {
+  const trackingId = document.getElementById("trackingId").value.trim();
+  const trackingResult = document.getElementById("trackingResult");
 
-trackBtn.addEventListener("click", () => {
-  const trackingNumber = trackingInput.value.trim();
+  trackingResult.innerHTML = ""; // Clear previous result
 
-  if (!trackingNumber) {
-    trackingResult.innerHTML = "<p class='error'>⚠️ Please enter a tracking number.</p>";
+  if (!trackingId) {
+    trackingResult.innerHTML = "<p class='error'>⚠️ Please enter a tracking ID.</p>";
     return;
   }
 
-  const dbRef = ref(db);
+  try {
+    const dbRef = ref(window.database);
+    const snapshot = await get(child(dbRef, `shipments/${trackingId}`));
 
-  get(child(dbRef, `shipments/${trackingNumber}`))
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        const shipment = snapshot.val();
+    if (snapshot.exists()) {
+      const data = snapshot.val();
 
-        let resultHTML = `
-          <h3>Shipment Details</h3>
-          <p><strong>Tracking Number:</strong> ${trackingNumber}</p>
-          <p><strong>Client Name:</strong> ${shipment.clientName || "N/A"}</p>
-          <p><strong>Origin:</strong> ${shipment.origin || "N/A"}</p>
-          <p><strong>Destination:</strong> ${shipment.destination || "N/A"}</p>
-          <p><strong>Status:</strong> ${shipment.status}</p>
-          <p><strong>Last Updated:</strong> ${shipment.lastUpdated || "N/A"}</p>
-        `;
+      let resultHTML = `
+        <h3>📦 Tracking Details</h3>
+        <p><strong>Tracking ID:</strong> ${trackingId}</p>
+        <p><strong>Client:</strong> ${data.clientName || "N/A"}</p>
+        <p><strong>Status:</strong> ${data.status || "N/A"}</p>
+        <p><strong>Location:</strong> ${data.location || "Unknown"}</p>
+      `;
 
-        if (shipment.stopped) {
-          resultHTML += `<p class="stopped">⚠️ This shipment has been stopped by admin.</p>`;
-        }
-
-        trackingResult.innerHTML = resultHTML;
-      } else {
-        trackingResult.innerHTML = "<p class='error'>❌ Tracking number not found.</p>";
+      // Add stopped warning if shipment is stopped
+      if (data.stopped) {
+        resultHTML += `<p class="stopped">⚠️ Shipment has been stopped by admin.</p>`;
       }
-    })
-    .catch((error) => {
-      trackingResult.innerHTML = `<p class='error'>Error fetching data: ${error.message}</p>`;
-    });
-});
+
+      // Add progress bar
+      resultHTML += `
+        <div class="progress-container">
+          <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+      `;
+
+      trackingResult.innerHTML = resultHTML;
+
+      // Update progress bar based on status
+      const progressBar = document.getElementById("progressBar");
+
+      let progress = 0;
+      if (data.status) {
+        switch (data.status.toLowerCase()) {
+          case "order placed":
+            progress = 25;
+            break;
+          case "in transit":
+            progress = 50;
+            break;
+          case "out for delivery":
+            progress = 75;
+            break;
+          case "delivered":
+            progress = 100;
+            break;
+          default:
+            progress = 10; // fallback
+        }
+      }
+
+      progressBar.style.width = progress + "%";
+      progressBar.textContent = progress + "%";
+    } else {
+      trackingResult.innerHTML = "<p class='error'>❌ No shipment found for this ID.</p>";
+    }
+  } catch (error) {
+    console.error(error);
+    trackingResult.innerHTML = "<p class='error'>⚠️ Error retrieving shipment data.</p>";
+  }
+};
