@@ -1,44 +1,32 @@
-import { db } from "./scripts/firebase.js";
-import { ref, set, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { ref, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { db } from "./firebase.js";
 
-// DOM elements
-const form = document.getElementById("admin-form");
-const resultBox = document.getElementById("admin-result");
-
-// Shipment steps
-const steps = ["Processing", "In Transit", "At Destination", "Delivered"];
-
-form.addEventListener("submit", async (e) => {
+// ✅ Handle form submission
+document.getElementById("shipmentForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const trackingId = document.getElementById("trackingId").value.trim();
+  const trackingNumber = document.getElementById("trackingNumber").value.trim();
   const status = document.getElementById("status").value;
+  const location = document.getElementById("location").value.trim();
 
-  if (!trackingId || !status) {
-    resultBox.textContent = "⚠️ Please enter both Tracking ID and Status.";
+  if (!trackingNumber || !status || !location) {
+    alert("⚠️ Please fill in all fields.");
     return;
   }
 
+  // ✅ Save to Firebase
   try {
-    // Check if shipment already exists
-    const shipmentRef = ref(db, "shipments/" + trackingId);
-    const snapshot = await get(shipmentRef);
+    await set(ref(db, "shipments/" + trackingNumber), {
+      status: status,
+      location: location,
+      updatedAt: new Date().toLocaleString()
+    });
 
-    if (snapshot.exists()) {
-      // Update existing shipment
-      await update(shipmentRef, { status: status });
-      resultBox.textContent = `✅ Shipment ${trackingId} updated to "${status}".`;
-    } else {
-      // Create new shipment record
-      await set(shipmentRef, {
-        trackingId: trackingId,
-        status: status,
-        createdAt: new Date().toISOString()
-      });
-      resultBox.textContent = `🆕 Shipment ${trackingId} created with status "${status}".`;
-    }
+    alert(`✅ Shipment ${trackingNumber} updated successfully!`);
+    document.getElementById("shipmentForm").reset();
+
   } catch (error) {
-    console.error(error);
-    resultBox.textContent = "⚠️ Error updating shipment.";
+    console.error("Error updating shipment:", error);
+    alert("❌ Failed to update shipment. Try again.");
   }
 });
