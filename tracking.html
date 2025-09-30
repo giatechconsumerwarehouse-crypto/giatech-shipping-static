@@ -3,72 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shipment Tracking | Giatech Shipping</title>
+  <title>Shipment Tracking - Giatech Shipping</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="/scripts/firebase.js"></script>
-<script src="/scripts/tracking.js"></script>
+</head>
+<body>
+  <h1>Track Your Shipment</h1>
 
-  <!-- Header -->
-  <header>
-    <div class="logo">
-      <i class="fas fa-ship"></i>
-      <h1>Giatech Shipping</h1>
-    </div>
-  </header>
+  <form id="tracking-form">
+    <input type="text" id="trackingId" placeholder="Enter Tracking ID" required>
+    <button type="submit">Track</button>
+  </form>
 
-  <!-- Tracking Section -->
-  <main class="tracking-container">
-    <h2>Track Your Shipment</h2>
-    <p>Enter your tracking number below to see the latest status.</p>
+  <div id="result"></div>
 
-    <div class="tracking-form">
-      <input type="text" id="trackingNumber" placeholder="Enter Tracking Number">
-      <button onclick="trackShipment()">Track</button>
-    </div>
+  <!-- Progress bar -->
+  <div class="progress-container">
+    <div id="progress" class="progress-bar"></div>
+    <span id="progress-text">No progress yet</span>
+  </div>
 
-    <!-- Shipment Status -->
-    <div id="trackingResult" class="tracking-result hidden">
-      <h3>Shipment Progress</h3>
-      
-      <!-- Progress Bar -->
-      <div class="progress-container">
-        <div class="progress-step" id="step1">
-          <div class="step-circle">1</div>
-          <div class="step-label">Order Placed</div>
-        </div>
-        <div class="progress-line"></div>
-        <div class="progress-step" id="step2">
-          <div class="step-circle">2</div>
-          <div class="step-label">Processing</div>
-        </div>
-        <div class="progress-line"></div>
-        <div class="progress-step" id="step3">
-          <div class="step-circle">3</div>
-          <div class="step-label">Shipped</div>
-        </div>
-        <div class="progress-line"></div>
-        <div class="progress-step" id="step4">
-          <div class="step-circle">4</div>
-          <div class="step-label">Delivered</div>
-        </div>
-      </div>
-
-      <!-- Live Status -->
-      <div class="live-status">
-        <i class="fas fa-location-dot"></i>
-        <span id="currentLocation">Fetching live location...</span>
-      </div>
-    </div>
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    <p>© 2025 Giatech Shipping. All Rights Reserved.</p>
-  </footer>
+  <!-- Firebase + Scripts -->
+  <script type="module" src="/scripts/tracking.js"></script>
 </body>
 </html>
