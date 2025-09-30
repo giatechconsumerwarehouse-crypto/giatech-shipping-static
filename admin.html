@@ -10,22 +10,22 @@
   <h1>Admin Panel - Update Shipments</h1>
 
   <form id="admin-form">
-    <label for="admin-trackingId">Tracking ID:</label>
-    <input type="text" id="admin-trackingId" placeholder="Enter tracking ID" required>
+  <label for="trackingId">Tracking ID</label>
+  <input type="text" id="trackingId" placeholder="Enter Tracking ID" required />
 
-    <label for="admin-status">Status:</label>
-    <select id="admin-status" required>
-      <option value="Processing">Processing</option>
-      <option value="In Transit">In Transit</option>
-      <option value="At Destination">At Destination</option>
-      <option value="Delivered">Delivered</option>
-    </select>
+  <label for="status">Update Status</label>
+  <select id="status" required>
+    <option value="Processing">Processing</option>
+    <option value="In Transit">In Transit</option>
+    <option value="At Destination">At Destination</option>
+    <option value="Delivered">Delivered</option>
+  </select>
 
-    <label for="admin-location">Location:</label>
-    <input type="text" id="admin-location" placeholder="Enter current location">
+  <button type="submit">Update Shipment</button>
+</form>
 
-    <button type="submit">Update Shipment</button>
-  </form>
+<div id="admin-result"></div>
+
 
   <!-- Firebase + Scripts -->
   <script type="module" src="/scripts/admin.js"></script>
