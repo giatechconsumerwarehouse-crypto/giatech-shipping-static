@@ -1,61 +1,23 @@
-// Import Firebase config
-import { db } from "./firebase.js";
-import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+// Import Firebase SDK
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-// Handle tracking form submit
-document.getElementById("tracking-form").addEventListener("submit", (e) => {
-    e.preventDefault();
+// ✅ Your Firebase configuration (from Firebase Console)
+const firebaseConfig = {
+  apiKey: "AIzaSyD4rtE-D8HT4BxUjAz-opq1S2y8OeXzBXw",
+  authDomain: "giatech-shipping.firebaseapp.com",
+  databaseURL: "https://giatech-shipping-default-rtdb.firebaseio.com",
+  projectId: "giatech-shipping",
+  storageBucket: "giatech-shipping.firebasestorage.app",
+  messagingSenderId: "906996624627",
+  appId: "1:906996624627:web:9d8b8cfa4e210202009b86"
+};
 
-    const trackingId = document.getElementById("trackingId").value.trim();
-    if (!trackingId) return;
+// ✅ Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
-    const shipmentRef = ref(db, "shipments/" + trackingId);
+// ✅ Get Realtime Database instance
+const db = getDatabase(app);
 
-    // Listen for real-time updates
-    onValue(shipmentRef, (snapshot) => {
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-
-            // Show shipment details
-            document.getElementById("result").innerHTML = `
-                <p><strong>Status:</strong> ${data.status}</p>
-                <p><strong>Location:</strong> ${data.location}</p>
-            `;
-
-            // Update progress bar
-            updateProgressBar(data.status);
-        } else {
-            document.getElementById("result").innerHTML = `
-                <p>No record found for ID: ${trackingId}</p>
-            `;
-            updateProgressBar(""); // Reset bar if no record
-        }
-    });
-});
-
-// Progress bar function
-function updateProgressBar(status) {
-    const bar = document.getElementById("progress");
-    const barText = document.getElementById("progress-text");
-    let percent = 0;
-
-    switch (status) {
-        case "Processing":
-            percent = 25;
-            break;
-        case "In Transit":
-            percent = 50;
-            break;
-        case "At Destination":
-            percent = 75;
-            break;
-        case "Delivered":
-            percent = 100;
-            break;
-        default:
-            percent = 0;
-    }
-
-    bar.style.width = percent + "%";
-    barText.textContent = status ? `${status} (${percent}%)` : "No progress yet";
-}
+// ✅ Export db so tracking.js and admin.js can use it
+export { db };
