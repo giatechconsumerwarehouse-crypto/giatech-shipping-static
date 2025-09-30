@@ -1,82 +1,77 @@
-// scripts/tracking.js
-
-let map;
-let marker;
-
-// Initialize Google Map
-function initMap() {
-  map = new google.maps.Map(document.getElementById("map"), {
-    center: { lat: 14.5995, lng: 120.9842 }, // Default Manila
-    zoom: 6,
-  });
-}
-
-// Listen to form submit
+// Track shipment and update UI
 document.getElementById("trackingForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
   const trackingId = document.getElementById("trackingInput").value.trim();
-  if (!trackingId) {
-    alert("Please enter a Tracking ID");
-    return;
-  }
+  if (!trackingId) return;
 
-  const shipmentRef = firebase.database().ref("shipments/" + trackingId);
+  firebase.database().ref("shipments/" + trackingId).once("value")
+    .then(snapshot => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
 
-  shipmentRef.on("value", (snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      document.getElementById("trackingResult").classList.remove("hidden");
+        // Show tracking result
+        document.getElementById("trackingResult").classList.remove("hidden");
 
-      // Fill details
-      document.getElementById("clientName").textContent = data.clientName || "N/A";
-      document.getElementById("origin").textContent = data.origin || "N/A";
-      document.getElementById("destination").textContent = data.destination || "N/A";
-      document.getElementById("status").textContent = data.status || "Pending";
+        // Fill details
+        document.getElementById("resultTrackingId").textContent = trackingId;
+        document.getElementById("resultClientName").textContent = data.clientName || "N/A";
+        document.getElementById("resultOrigin").textContent = data.origin || "N/A";
+        document.getElementById("resultDestination").textContent = data.destination || "N/A";
+        document.getElementById("resultStatus").textContent = data.status || "Pending";
 
-      // Update progress bar
-      updateProgressBar(data.status);
+        // Update progress bar
+        updateProgress(data.status);
 
-      // Update Map
-      if (data.location && data.location.lat && data.location.lng) {
-        const position = { lat: data.location.lat, lng: data.location.lng };
-        map.setCenter(position);
-        map.setZoom(12);
-
-        if (marker) {
-          marker.setPosition(position);
+        // Show proof of delivery if available
+        if (data.proofOfDelivery) {
+          document.getElementById("proofContainer").classList.remove("hidden");
+          document.getElementById("proofImage").src = data.proofOfDelivery;
         } else {
-          marker = new google.maps.Marker({
-            position: position,
-            map: map,
-            title: "Shipment Location",
-          });
+          document.getElementById("proofContainer").classList.add("hidden");
         }
-      }
 
-      // Show Proof of Delivery if available
-      if (data.proofUrl) {
-        document.getElementById("proofSection").classList.remove("hidden");
-        document.getElementById("proofImage").src = data.proofUrl;
+        // Update live map if location exists
+        if (data.location && data.location.lat && data.location.lng) {
+          updateMap(data.location.lat, data.location.lng);
+        }
       } else {
-        document.getElementById("proofSection").classList.add("hidden");
+        alert("No shipment found with Tracking ID: " + trackingId);
       }
-
-    } else {
-      alert("No shipment found with Tracking ID: " + trackingId);
-    }
-  });
+    });
 });
 
-// Progress Bar Update Function
-function updateProgressBar(status) {
+// Progress bar handler
+function updateProgress(status) {
   const steps = ["Order Placed", "Processing", "Shipped", "Delivered"];
   steps.forEach((step, index) => {
-    const circle = document.querySelector(`#step-${index + 1} .step-circle`);
+    const stepElement = document.getElementById("step" + (index + 1));
     if (steps.indexOf(status) >= index) {
-      circle.classList.add("active");
+      stepElement.classList.add("active");
     } else {
-      circle.classList.remove("active");
+      stepElement.classList.remove("active");
     }
   });
+}
+
+// Google Maps
+let map, marker;
+function initMap() {
+  const defaultPos = { lat: 14.5995, lng: 120.9842 }; // Manila default
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: defaultPos,
+    zoom: 6,
+  });
+  marker = new google.maps.Marker({
+    position: defaultPos,
+    map: map,
+    title: "Shipment Location",
+  });
+}
+
+function updateMap(lat, lng) {
+  const newPos = { lat, lng };
+  map.setCenter(newPos);
+  map.setZoom(10);
+  marker.setPosition(newPos);
 }
