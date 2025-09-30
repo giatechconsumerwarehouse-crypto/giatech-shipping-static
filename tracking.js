@@ -40,7 +40,18 @@ function resetSteps() {
 
 // Activate step
 function activateStep(stepNumber) {
+  resetSteps();
   for (let i = 1; i <= stepNumber; i++) {
     document.getElementById(`step-${i}`).classList.add("active");
   }
+
+  // Animate lines
+  const lines = document.querySelectorAll(".progress-line");
+  lines.forEach((line, index) => {
+    if (index < stepNumber - 1) {
+      line.querySelector("::after"); // ensures transition triggers
+      line.style.setProperty("--line-fill", "100%");
+    }
+  });
 }
+
