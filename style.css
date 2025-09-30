@@ -1,82 +1,84 @@
-/* General */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  padding: 0;
-  background: #f9f9f9;
-}
-header, footer {
-  background: #007bff;
-  color: #fff;
-  text-align: center;
-  padding: 15px;
-}
-h1, h2 {
-  margin: 10px 0;
+  padding: 20px;
+  background: #f4f6f8;
 }
 
-/* Tracking */
-.tracking-section {
-  text-align: center;
-  margin: 30px auto;
-  max-width: 500px;
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-.tracking-box {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-.tracking-box input {
+
+form input {
   padding: 10px;
+  width: 70%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+form button {
+  padding: 10px 20px;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+form button:hover {
+  background: #0056b3;
+}
+
+.hidden {
+  display: none;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+
+.progress-step {
+  text-align: center;
   flex: 1;
 }
-.tracking-box button {
-  padding: 10px 20px;
+
+.step-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ccc;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  font-weight: bold;
+}
+
+.step-label {
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.progress-line {
+  flex: 1;
+  height: 4px;
+  background: #ccc;
+  margin: 0 5px;
+}
+
+.progress-step.active .step-circle {
   background: #007bff;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
 }
-
-/* Shipment info */
-.shipment-info {
-  margin-top: 20px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fff;
-}
-.progress-bar {
-  width: 100%;
-  background: #eee;
-  border-radius: 20px;
-  overflow: hidden;
-  height: 15px;
-  margin-top: 10px;
-}
-.progress {
-  height: 100%;
-  background: linear-gradient(90deg, #007bff, #00c6ff);
-  width: 0%;
-  transition: width 0.4s ease;
-}
-
-/* Login/Admin */
-.login-section, .admin-section {
-  max-width: 400px;
-  margin: 50px auto;
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-}
-.login-section input, .admin-section input {
-  display: block;
-  margin: 10px auto;
-  padding: 10px;
-  width: 100%;
-}
-button {
-  cursor: pointer;
+.progress-step.active .step-label {
+  font-weight: bold;
+  color: #007bff;
 }
