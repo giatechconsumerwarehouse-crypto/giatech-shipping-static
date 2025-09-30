@@ -1,31 +1,44 @@
-// Import Firebase config
-import { db } from "./firebase.js";
-import { ref, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { db } from "./scripts/firebase.js";
+import { ref, set, get, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-// Handle admin form submit
-document.getElementById("admin-form").addEventListener("submit", (e) => {
-    e.preventDefault();
+// DOM elements
+const form = document.getElementById("admin-form");
+const resultBox = document.getElementById("admin-result");
 
-    const trackingId = document.getElementById("admin-trackingId").value.trim();
-    const status = document.getElementById("admin-status").value;
-    const location = document.getElementById("admin-location").value.trim();
+// Shipment steps
+const steps = ["Processing", "In Transit", "At Destination", "Delivered"];
 
-    if (!trackingId) {
-        alert("Please enter a Tracking ID");
-        return;
-    }
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    // Save data to Firebase
-    set(ref(db, "shipments/" + trackingId), {
+  const trackingId = document.getElementById("trackingId").value.trim();
+  const status = document.getElementById("status").value;
+
+  if (!trackingId || !status) {
+    resultBox.textContent = "⚠️ Please enter both Tracking ID and Status.";
+    return;
+  }
+
+  try {
+    // Check if shipment already exists
+    const shipmentRef = ref(db, "shipments/" + trackingId);
+    const snapshot = await get(shipmentRef);
+
+    if (snapshot.exists()) {
+      // Update existing shipment
+      await update(shipmentRef, { status: status });
+      resultBox.textContent = `✅ Shipment ${trackingId} updated to "${status}".`;
+    } else {
+      // Create new shipment record
+      await set(shipmentRef, {
+        trackingId: trackingId,
         status: status,
-        location: location || "Unknown"
-    })
-    .then(() => {
-        alert("Shipment updated successfully!");
-        document.getElementById("admin-form").reset();
-    })
-    .catch((error) => {
-        console.error("Error updating shipment:", error);
-        alert("Failed to update shipment. Check console for details.");
-    });
+        createdAt: new Date().toISOString()
+      });
+      resultBox.textContent = `🆕 Shipment ${trackingId} created with status "${status}".`;
+    }
+  } catch (error) {
+    console.error(error);
+    resultBox.textContent = "⚠️ Error updating shipment.";
+  }
 });
