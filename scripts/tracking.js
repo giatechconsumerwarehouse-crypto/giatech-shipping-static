@@ -1,42 +1,44 @@
-// tracking.js
+// scripts/tracking.js
+import { db } from "./firebase.js";
+import { ref, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-// Initialize Google Map
-let map;
-let marker;
+// Elements
+const trackBtn = document.getElementById("trackBtn");
+const trackingNumberInput = document.getElementById("trackingNumber");
+const resultContainer = document.getElementById("trackingResult");
 
-function initMap() {
-  // Default location (Manila) before Firebase loads
-  const defaultLocation = { lat: 14.5995, lng: 120.9842 };
+// Track button click
+trackBtn.addEventListener("click", async () => {
+  const trackingNumber = trackingNumberInput.value.trim();
+  if (!trackingNumber) {
+    resultContainer.innerHTML = "<p style='color:red;'>Please enter a tracking number.</p>";
+    return;
+  }
 
-  map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 12,
-    center: defaultLocation,
-  });
+  try {
+    const dbRef = ref(db);
+    const snapshot = await get(child(dbRef, `shipments/${trackingNumber}`));
 
-  marker = new google.maps.Marker({
-    position: defaultLocation,
-    map: map,
-    title: "Shipment Location",
-  });
+    if (snapshot.exists()) {
+      const data = snapshot.val();
 
-  // Start listening to Firebase for live updates
-  listenForLocationUpdates();
-}
-
-// Listen for live location updates from Firebase
-function listenForLocationUpdates() {
-  const db = firebase.database();
-  const locationRef = db.ref("shipment/location");
-
-  locationRef.on("value", (snapshot) => {
-    const data = snapshot.val();
-    if (data && data.lat && data.lng) {
-      const newLocation = { lat: data.lat, lng: data.lng };
-      marker.setPosition(newLocation);
-      map.setCenter(newLocation);
+      // Display shipment info
+      resultContainer.innerHTML = `
+        <div class="shipment-info">
+          <h3>Shipment Details</h3>
+          <p><strong>Status:</strong> ${data.status}</p>
+          <p><strong>Location:</strong> ${data.location}</p>
+          <p><strong>ETA:</strong> ${data.eta}</p>
+          <div class="progress-bar">
+            <div class="progress" style="width: ${data.progress || 0}%;"></div>
+          </div>
+        </div>
+      `;
+    } else {
+      resultContainer.innerHTML = "<p style='color:red;'>Tracking number not found.</p>";
     }
-  });
-}
-
-// Load map after page load
-window.onload = initMap;
+  } catch (error) {
+    console.error(error);
+    resultContainer.innerHTML = "<p style='color:red;'>Error retrieving data. Please try again later.</p>";
+  }
+});
