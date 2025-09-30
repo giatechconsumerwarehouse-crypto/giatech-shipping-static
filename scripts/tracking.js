@@ -1,41 +1,82 @@
 // scripts/tracking.js
-import { db } from "./firebase.js";
-import { ref, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-const trackBtn = document.getElementById("trackBtn");
-const trackingInput = document.getElementById("trackingInput");
-const resultContainer = document.getElementById("trackingResult");
+let map;
+let marker;
 
-trackBtn.addEventListener("click", async () => {
-  const trackingNumber = trackingInput.value.trim();
-  if (!trackingNumber) {
-    resultContainer.innerHTML = "<p style='color:red;'>Enter a tracking number.</p>";
+// Initialize Google Map
+function initMap() {
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 14.5995, lng: 120.9842 }, // Default Manila
+    zoom: 6,
+  });
+}
+
+// Listen to form submit
+document.getElementById("trackingForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const trackingId = document.getElementById("trackingInput").value.trim();
+  if (!trackingId) {
+    alert("Please enter a Tracking ID");
     return;
   }
 
-  try {
-    const dbRef = ref(db);
-    const snapshot = await get(child(dbRef, `shipments/${trackingNumber}`));
+  const shipmentRef = firebase.database().ref("shipments/" + trackingId);
 
+  shipmentRef.on("value", (snapshot) => {
     if (snapshot.exists()) {
       const data = snapshot.val();
-      resultContainer.innerHTML = `
-        <div class="shipment-info">
-          <h3>Shipment ${trackingNumber}</h3>
-          <p><strong>Status:</strong> ${data.status}</p>
-          <p><strong>Origin:</strong> ${data.origin}</p>
-          <p><strong>Destination:</strong> ${data.destination}</p>
-          <p><strong>ETA:</strong> ${data.eta}</p>
-          <div class="progress-bar">
-            <div class="progress" style="width: ${data.progress || 0}%;"></div>
-          </div>
-        </div>
-      `;
+      document.getElementById("trackingResult").classList.remove("hidden");
+
+      // Fill details
+      document.getElementById("clientName").textContent = data.clientName || "N/A";
+      document.getElementById("origin").textContent = data.origin || "N/A";
+      document.getElementById("destination").textContent = data.destination || "N/A";
+      document.getElementById("status").textContent = data.status || "Pending";
+
+      // Update progress bar
+      updateProgressBar(data.status);
+
+      // Update Map
+      if (data.location && data.location.lat && data.location.lng) {
+        const position = { lat: data.location.lat, lng: data.location.lng };
+        map.setCenter(position);
+        map.setZoom(12);
+
+        if (marker) {
+          marker.setPosition(position);
+        } else {
+          marker = new google.maps.Marker({
+            position: position,
+            map: map,
+            title: "Shipment Location",
+          });
+        }
+      }
+
+      // Show Proof of Delivery if available
+      if (data.proofUrl) {
+        document.getElementById("proofSection").classList.remove("hidden");
+        document.getElementById("proofImage").src = data.proofUrl;
+      } else {
+        document.getElementById("proofSection").classList.add("hidden");
+      }
+
     } else {
-      resultContainer.innerHTML = "<p style='color:red;'>Tracking number not found.</p>";
+      alert("No shipment found with Tracking ID: " + trackingId);
     }
-  } catch (error) {
-    console.error(error);
-    resultContainer.innerHTML = "<p style='color:red;'>Error retrieving data.</p>";
-  }
+  });
 });
+
+// Progress Bar Update Function
+function updateProgressBar(status) {
+  const steps = ["Order Placed", "Processing", "Shipped", "Delivered"];
+  steps.forEach((step, index) => {
+    const circle = document.querySelector(`#step-${index + 1} .step-circle`);
+    if (steps.indexOf(status) >= index) {
+      circle.classList.add("active");
+    } else {
+      circle.classList.remove("active");
+    }
+  });
+}
