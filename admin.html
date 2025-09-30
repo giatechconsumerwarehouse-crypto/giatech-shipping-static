@@ -3,39 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - Giatech Shipping</title>
+  <title>Admin Dashboard | Giatech Shipping</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+  <!-- Firebase Config -->
+  <script src="scripts/firebase.js" defer></script>
+  <!-- Admin Script -->
+  <script src="scripts/admin.js" defer></script>
 </head>
 <body>
-  <header>
+  <div class="container">
     <h1>Admin Dashboard</h1>
-    <button id="logoutBtn">Logout</button>
-  </header>
+    <p>Welcome, Admin! Manage shipments and upload delivery proofs here.</p>
 
-  <main>
-    <section class="admin-section">
-      <h2>Manage Shipments</h2>
-      <form id="shipmentForm">
-        <input type="text" id="trackingNumber" placeholder="Tracking Number" required>
-        <input type="text" id="origin" placeholder="Origin" required>
-        <input type="text" id="destination" placeholder="Destination" required>
-        <input type="text" id="status" placeholder="Status" required>
-        <input type="text" id="eta" placeholder="ETA (YYYY-MM-DD)" required>
-        <input type="number" id="progress" placeholder="Progress %" required>
-        <button type="submit">Save Shipment</button>
+    <!-- ==================== Add Shipment ==================== -->
+    <section>
+      <h2>Add Shipment</h2>
+      <form id="addShipmentForm">
+        <label for="trackingId">Tracking ID</label>
+        <input type="text" id="trackingId" required>
+
+        <label for="clientName">Client Name</label>
+        <input type="text" id="clientName" required>
+
+        <label for="origin">Origin</label>
+        <input type="text" id="origin" required>
+
+        <label for="destination">Destination</label>
+        <input type="text" id="destination" required>
+
+        <label for="status">Status</label>
+        <select id="status" required>
+          <option value="Order Placed">Order Placed</option>
+          <option value="Processing">Processing</option>
+          <option value="Shipped">Shipped</option>
+          <option value="Delivered">Delivered</option>
+        </select>
+
+        <button type="submit">Add Shipment</button>
       </form>
-      <div id="adminMessage"></div>
     </section>
-  </main>
 
-  <script type="module" src="./scripts/firebase.js"></script>
-  <script type="module" src="./scripts/admin.js"></script>
+    <!-- ==================== Update Status ==================== -->
+    <section>
+      <h2>Update Shipment Status</h2>
+      <form onsubmit="event.preventDefault(); updateStatus(document.getElementById('updateTrackingId').value, document.getElementById('newStatus').value);">
+        <label for="updateTrackingId">Tracking ID</label>
+        <input type="text" id="updateTrackingId" required>
+
+        <label for="newStatus">New Status</label>
+        <select id="newStatus" required>
+          <option value="Order Placed">Order Placed</option>
+          <option value="Processing">Processing</option>
+          <option value="Shipped">Shipped</option>
+          <option value="Delivered">Delivered</option>
+        </select>
+
+        <button type="submit">Update Status</button>
+      </form>
+    </section>
+
+    <!-- ==================== Upload Proof ==================== -->
+    <section>
+      <h2>Upload Delivery Proof</h2>
+      <form onsubmit="event.preventDefault(); uploadProof();">
+        <label for="proofTrackingId">Tracking ID</label>
+        <input type="text" id="proofTrackingId" required>
+
+        <label for="proofFile">Select File (image)</label>
+        <input type="file" id="proofFile" accept="image/*" required>
+
+        <button type="submit">Upload Proof</button>
+      </form>
+    </section>
+
+    <!-- ==================== Logout ==================== -->
+    <section>
+      <button onclick="firebase.auth().signOut().then(() => { window.location.href='login.html'; });">
+        Logout
+      </button>
+    </section>
+  </div>
 </body>
 </html>
-<!-- Delivery Proof Section -->
-<div class="form-section">
-  <h2>Upload Delivery Proof</h2>
-  <input type="text" id="proofTrackingId" placeholder="Enter Tracking ID" required>
-  <input type="file" id="proofFile" accept="image/*">
-  <button onclick="uploadProof()">Upload Proof</button>
-</div>
