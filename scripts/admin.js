@@ -1,32 +1,114 @@
-import { ref, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-import { db } from "./firebase.js";
+// scripts/admin.js
+import { auth, db } from "./firebase.js";
+import { 
+  signInWithEmailAndPassword, 
+  signOut 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { 
+  ref, set, update 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// ✅ Handle form submission
-document.getElementById("shipmentForm").addEventListener("submit", async (e) => {
+// Select DOM elements
+const loginSection = document.getElementById("login-section");
+const dashboardSection = document.getElementById("dashboard-section");
+const loginForm = document.getElementById("loginForm");
+const loginMessage = document.getElementById("loginMessage");
+const logoutBtn = document.getElementById("logoutBtn");
+
+const addShipmentForm = document.getElementById("addShipmentForm");
+const updateShipmentForm = document.getElementById("updateShipmentForm");
+const stopShipmentForm = document.getElementById("stopShipmentForm");
+
+// -------------------- LOGIN --------------------
+loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const trackingNumber = document.getElementById("trackingNumber").value.trim();
-  const status = document.getElementById("status").value;
-  const location = document.getElementById("location").value.trim();
+  const email = document.getElementById("adminEmail").value;
+  const password = document.getElementById("adminPassword").value;
 
-  if (!trackingNumber || !status || !location) {
-    alert("⚠️ Please fill in all fields.");
-    return;
-  }
-
-  // ✅ Save to Firebase
-  try {
-    await set(ref(db, "shipments/" + trackingNumber), {
-      status: status,
-      location: location,
-      updatedAt: new Date().toLocaleString()
+  signInWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      loginMessage.textContent = "Login successful!";
+      loginSection.style.display = "none";
+      dashboardSection.style.display = "block";
+    })
+    .catch((error) => {
+      loginMessage.textContent = "Login failed: " + error.message;
     });
-
-    alert(`✅ Shipment ${trackingNumber} updated successfully!`);
-    document.getElementById("shipmentForm").reset();
-
-  } catch (error) {
-    console.error("Error updating shipment:", error);
-    alert("❌ Failed to update shipment. Try again.");
-  }
 });
+
+// -------------------- LOGOUT --------------------
+logoutBtn.addEventListener("click", () => {
+  signOut(auth).then(() => {
+    loginSection.style.display = "block";
+    dashboardSection.style.display = "none";
+    loginMessage.textContent = "You have logged out.";
+  });
+});
+
+// -------------------- ADD SHIPMENT --------------------
+addShipmentForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const trackingNumber = document.getElementById("trackingNumber").value;
+  const clientName = document.getElementById("clientName").value;
+  const origin = document.getElementById("origin").value;
+  const destination = document.getElementById("destination").value;
+
+  set(ref(db, "shipments/" + trackingNumber), {
+    clientName: clientName,
+    origin: origin,
+    destination: destination,
+    status: "Pending",
+    stopped: false,
+    lastUpdated: new Date().toISOString()
+  })
+    .then(() => {
+      alert("Shipment added successfully!");
+      addShipmentForm.reset();
+    })
+    .catch((error) => {
+      alert("Error adding shipment: " + error.message);
+    });
+});
+
+// -------------------- UPDATE SHIPMENT --------------------
+updateShipmentForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const trackingNumber = document.getElementById("updateTrackingNumber").value;
+  const status = document.getElementById("shipmentStatus").value;
+
+  update(ref(db, "shipments/" + trackingNumber), {
+    status: status,
+    lastUpdated: new Date().toISOString()
+  })
+    .then(() => {
+      alert("Shipment status updated!");
+      updateShipmentForm.reset();
+    })
+    .catch((error) => {
+      alert("Error updating shipment: " + error.message);
+    });
+});
+
+// -------------------- STOP SHIPMENT --------------------
+stopShipmentForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const trackingNumber = document.getElementById("stopTrackingNumber").value;
+
+  update(ref(db, "shipments/" + trackingNumber), {
+    stopped: true,
+    status: "Stopped",
+    lastUpdated: new Date().toISOString()
+  })
+    .then(() => {
+      alert("Shipment stopped successfully!");
+      stopShipmentForm.reset();
+    })
+    .catch((error) => {
+      alert("Error stopping shipment: " + error.message);
+    });
+});
+        
