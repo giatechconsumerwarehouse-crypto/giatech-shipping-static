@@ -1,42 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Giatech Shipping</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giatech Shipping - Track Your Shipment</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <h1>🚢 Giatech Shipping</h1>
-    <p>Fast • Secure • Reliable</p>
+
+  <!-- 🌐 Header -->
+  <header>
+    <h1>Giatech Shipping</h1>
+    <p>Fast • Secure • Reliable Delivery Across the Philippines</p>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <h2>Your trusted logistics partner across the Philippines</h2>
-    <p>Track your shipments in real-time with ease.</p>
-    <div class="buttons">
-      <a href="tracking.html" class="btn">📦 Track Shipment</a>
-      <a href="login.html" class="btn secondary">🔑 Admin Login</a>
+  <!-- 🌐 Main Container -->
+  <div class="container">
+
+    <!-- Tracking Form -->
+    <div class="tracking-form">
+      <h2>Track Your Shipment</h2>
+      <input type="text" id="trackingNumber" placeholder="Enter Tracking Number" />
+      <button onclick="trackShipment()">Track</button>
     </div>
-  </section>
 
-  <!-- About Section -->
-  <section class="about">
-    <h2>Why Choose Giatech?</h2>
-    <ul>
-      <li>✔ Fast and reliable nationwide delivery</li>
-      <li>✔ Real-time shipment tracking</li>
-      <li>✔ Dedicated admin support</li>
-      <li>✔ Secure handling of your packages</li>
-    </ul>
-  </section>
+    <!-- Progress Bar -->
+    <div class="progress-container" id="progressContainer" style="display:none;">
+      <div class="progress-line"></div>
+      <div class="progress-step" id="step1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Order Placed</div>
+      </div>
+      <div class="progress-step" id="step2">
+        <div class="step-circle">2</div>
+        <div class="step-label">Processing</div>
+      </div>
+      <div class="progress-step" id="step3">
+        <div class="step-circle">3</div>
+        <div class="step-label">Shipped</div>
+      </div>
+      <div class="progress-step" id="step4">
+        <div class="step-circle">4</div>
+        <div class="step-label">Delivered</div>
+      </div>
+    </div>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p>© 2025 Giatech Shipping. All Rights Reserved.</p>
-  </footer>
+    <!-- Shipment Details -->
+    <div class="shipment-details" id="shipmentDetails" style="display:none;">
+      <h3>Shipment Details</h3>
+      <p><strong>Tracking Number:</strong> <span id="detailTrackingNumber"></span></p>
+      <p><strong>Status:</strong> <span id="detailStatus"></span></p>
+      <p><strong>Location:</strong> <span id="detailLocation"></span></p>
+      <p><strong>Last Updated:</strong> <span id="detailUpdated"></span></p>
+    </div>
+
+  </div>
+
+  <!-- 🌐 Scripts -->
+  <script type="module" src="scripts/firebase.js"></script>
+  <script type="module" src="scripts/tracking.js"></script>
+
 </body>
-</html>
+        </html>
+        
