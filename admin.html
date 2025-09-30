@@ -7,27 +7,35 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Admin Panel - Update Shipments</h1>
 
-  <form id="admin-form">
-  <label for="trackingId">Tracking ID</label>
-  <input type="text" id="trackingId" placeholder="Enter Tracking ID" required />
+  <header>
+    <h1>Giatech Shipping - Admin Panel</h1>
+    <p>Manage shipments and update statuses</p>
+  </header>
 
-  <label for="status">Update Status</label>
-  <select id="status" required>
-    <option value="Processing">Processing</option>
-    <option value="In Transit">In Transit</option>
-    <option value="At Destination">At Destination</option>
-    <option value="Delivered">Delivered</option>
-  </select>
+  <div class="container admin-container">
+    <h2>Update Shipment</h2>
 
-  <button type="submit">Update Shipment</button>
-</form>
+    <form class="admin-form" id="shipmentForm">
+      <input type="text" id="trackingNumber" placeholder="Tracking Number" required />
 
-<div id="admin-result"></div>
+      <select id="status" required>
+        <option value="">-- Select Status --</option>
+        <option value="Order Placed">Order Placed</option>
+        <option value="Processing">Processing</option>
+        <option value="Shipped">Shipped</option>
+        <option value="Delivered">Delivered</option>
+      </select>
 
+      <input type="text" id="location" placeholder="Current Location" required />
 
-  <!-- Firebase + Scripts -->
-  <script type="module" src="/scripts/admin.js"></script>
+      <button type="submit">Update Shipment</button>
+    </form>
+  </div>
+
+  <!-- Firebase + Admin Script -->
+  <script type="module" src="scripts/firebase.js"></script>
+  <script type="module" src="scripts/admin.js"></script>
+
 </body>
 </html>
