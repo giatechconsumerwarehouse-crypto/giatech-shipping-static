@@ -1,4 +1,4 @@
-// Track shipment and update UI
+// Track shipment
 document.getElementById("trackingForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
@@ -10,20 +10,16 @@ document.getElementById("trackingForm").addEventListener("submit", function (e) 
       if (snapshot.exists()) {
         const data = snapshot.val();
 
-        // Show tracking result
         document.getElementById("trackingResult").classList.remove("hidden");
 
-        // Fill details
         document.getElementById("resultTrackingId").textContent = trackingId;
         document.getElementById("resultClientName").textContent = data.clientName || "N/A";
         document.getElementById("resultOrigin").textContent = data.origin || "N/A";
         document.getElementById("resultDestination").textContent = data.destination || "N/A";
         document.getElementById("resultStatus").textContent = data.status || "Pending";
 
-        // Update progress bar
         updateProgress(data.status);
 
-        // Show proof of delivery if available
         if (data.proofOfDelivery) {
           document.getElementById("proofContainer").classList.remove("hidden");
           document.getElementById("proofImage").src = data.proofOfDelivery;
@@ -31,7 +27,6 @@ document.getElementById("trackingForm").addEventListener("submit", function (e) 
           document.getElementById("proofContainer").classList.add("hidden");
         }
 
-        // Update live map if location exists
         if (data.location && data.location.lat && data.location.lng) {
           updateMap(data.location.lat, data.location.lng);
         }
@@ -57,7 +52,7 @@ function updateProgress(status) {
 // Google Maps
 let map, marker;
 function initMap() {
-  const defaultPos = { lat: 14.5995, lng: 120.9842 }; // Manila default
+  const defaultPos = { lat: 14.5995, lng: 120.9842 }; // Manila
   map = new google.maps.Map(document.getElementById("map"), {
     center: defaultPos,
     zoom: 6,
