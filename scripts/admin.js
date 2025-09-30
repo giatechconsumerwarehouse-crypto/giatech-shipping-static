@@ -1,48 +1,55 @@
-// Import Firebase from firebase.js
-import { db } from "./firebase.js";
-import { ref, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+// scripts/admin.js
+import { auth, db } from "./firebase.js";
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { ref, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-const form = document.getElementById("adminForm");
-const resultBox = document.getElementById("adminResult");
+// --- Login page ---
+const loginBtn = document.getElementById("loginBtn");
+if (loginBtn) {
+  loginBtn.addEventListener("click", async () => {
+    const email = document.getElementById("adminEmail").value;
+    const password = document.getElementById("adminPassword").value;
+    const message = document.getElementById("loginMessage");
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "admin.html";
+    } catch (error) {
+      message.innerHTML = `<p style='color:red;'>${error.message}</p>`;
+    }
+  });
+}
 
-// Handle form submission
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+// --- Admin dashboard ---
+const form = document.getElementById("shipmentForm");
+if (form) {
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+    }
+  });
 
-  // Collect form data
-  const trackingId = document.getElementById("trackingId").value.trim();
-  const customerName = document.getElementById("customerName").value.trim();
-  const status = document.getElementById("status").value;
-  const location = document.getElementById("location").value.trim();
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const trackingNumber = document.getElementById("trackingNumber").value;
+    const shipmentData = {
+      origin: document.getElementById("origin").value,
+      destination: document.getElementById("destination").value,
+      status: document.getElementById("status").value,
+      eta: document.getElementById("eta").value,
+      progress: parseInt(document.getElementById("progress").value)
+    };
+    try {
+      await set(ref(db, `shipments/${trackingNumber}`), shipmentData);
+      document.getElementById("adminMessage").innerHTML = "<p style='color:green;'>Shipment saved!</p>";
+      form.reset();
+    } catch (error) {
+      console.error(error);
+    }
+  });
 
-  if (!trackingId || !customerName) {
-    alert("Tracking ID and Customer Name are required.");
-    return;
-  }
-
-  try {
-    // Save or update shipment in Firebase
-    await set(ref(db, "shipments/" + trackingId), {
-      customerName: customerName,
-      status: status,
-      location: location,
-      lastUpdated: new Date().toISOString()
-    });
-
-    // Show confirmation
-    resultBox.style.display = "block";
-    resultBox.innerHTML = `
-      ✅ Shipment <strong>${trackingId}</strong> updated!<br>
-      Customer: ${customerName}<br>
-      Status: ${status}<br>
-      Location: ${location}
-    `;
-
-    // Reset form
-    form.reset();
-
-  } catch (error) {
-    console.error("Error updating shipment:", error);
-    alert("Failed to update shipment. Check console.");
-  }
-});
+  const logoutBtn = document.getElementById("logoutBtn");
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    window.location.href = "login.html";
+  });
+}
