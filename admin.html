@@ -7,23 +7,27 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="admin-container">
-    <h1>Admin Panel</h1>
-    <p>Welcome, Admin! Here you can manage shipments and update tracking.</p>
+  <h1>Admin Panel - Update Shipments</h1>
 
-    <!-- Example Tracking Form -->
-    <form id="update-form">
-      <input type="text" id="trackingId" placeholder="Tracking ID" required>
-      <input type="text" id="status" placeholder="Update Status" required>
-      <button type="submit">Update Tracking</button>
-    </form>
+  <form id="admin-form">
+    <label for="admin-trackingId">Tracking ID:</label>
+    <input type="text" id="admin-trackingId" placeholder="Enter tracking ID" required>
 
-    <button id="logout-btn">Logout</button>
-  </div>
+    <label for="admin-status">Status:</label>
+    <select id="admin-status" required>
+      <option value="Processing">Processing</option>
+      <option value="In Transit">In Transit</option>
+      <option value="At Destination">At Destination</option>
+      <option value="Delivered">Delivered</option>
+    </select>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="/scripts/firebase.js"></script>
-<script src="/scripts/admin.js"></script>
+    <label for="admin-location">Location:</label>
+    <input type="text" id="admin-location" placeholder="Enter current location">
 
+    <button type="submit">Update Shipment</button>
+  </form>
+
+  <!-- Firebase + Scripts -->
+  <script type="module" src="/scripts/admin.js"></script>
+</body>
+</html>
