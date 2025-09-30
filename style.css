@@ -173,3 +173,37 @@ button:hover {
   border-radius: 6px;
   display: none;
 }
+/* Progress Bar Styles */
+.progress-bar {
+  width: 100%;
+  background: #eee;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 10px;
+  height: 15px;
+}
+
+.progress {
+  height: 100%;
+  background: linear-gradient(90deg, #007bff, #00c6ff);
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* Shipment Info Box */
+.shipment-info {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.shipment-info h3 {
+  margin-top: 0;
+  color: #007bff;
+}
+
+.shipment-info p {
+  margin: 5px 0;
+   }
