@@ -5,6 +5,9 @@ import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-
 const form = document.getElementById("trackingForm");
 const resultBox = document.getElementById("trackingResult");
 
+let map;
+let marker;
+
 // Handle tracking form submit
 form.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -33,6 +36,11 @@ form.addEventListener("submit", (e) => {
 
       // Update progress bar
       updateProgress(data.status);
+
+      // Update Google Maps if location is available
+      if (data.lat && data.lng) {
+        updateMap(data.lat, data.lng);
+      }
     } else {
       alert("No shipment found with Tracking ID: " + trackingId);
     }
@@ -51,3 +59,23 @@ function updateProgress(status) {
     }
   });
 }
+
+// Initialize or update Google Map
+function updateMap(lat, lng) {
+  const location = { lat: parseFloat(lat), lng: parseFloat(lng) };
+
+  if (!map) {
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: location,
+      zoom: 12,
+    });
+    marker = new google.maps.Marker({
+      position: location,
+      map: map,
+    });
+  } else {
+    map.setCenter(location);
+    marker.setPosition(location);
+  }
+}
+  
