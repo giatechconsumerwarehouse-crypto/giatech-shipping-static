@@ -2,27 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shipment Tracking - Giatech Shipping</title>
+  <title>Track Your Shipment - Giatech Shipping</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <script type="module" src="scripts/firebase.js"></script>
 </head>
 <body>
   <h1>Track Your Shipment</h1>
 
-  <form id="tracking-form">
-    <input type="text" id="trackingId" placeholder="Enter Tracking ID" required>
+  <!-- Tracking Form -->
+  <form id="trackingForm">
+    <input type="text" id="trackingIdInput" placeholder="Enter Tracking ID" required>
     <button type="submit">Track</button>
   </form>
 
-  <div id="result"></div>
+  <!-- Tracking Result -->
+  <div id="trackingResult" style="display:none;">
+    <h2>Shipment Details</h2>
+    <p><strong>Customer:</strong> <span id="customerName"></span></p>
+    <p><strong>Location:</strong> <span id="currentLocation"></span></p>
+    <p><strong>Status:</strong> <span id="currentStatus"></span></p>
+    <p><strong>Last Updated:</strong> <span id="lastUpdated"></span></p>
 
-  <!-- Progress bar -->
-  <div class="progress-container">
-    <div id="progress" class="progress-bar"></div>
-    <span id="progress-text">No progress yet</span>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-step" id="step1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Order Placed</div>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" id="step2">
+        <div class="step-circle">2</div>
+        <div class="step-label">Processing</div>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" id="step3">
+        <div class="step-circle">3</div>
+        <div class="step-label">Shipped</div>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" id="step4">
+        <div class="step-circle">4</div>
+        <div class="step-label">Delivered</div>
+      </div>
+    </div>
   </div>
 
-  <!-- Firebase + Scripts -->
-  <script type="module" src="/scripts/tracking.js"></script>
+  <!-- Tracking Script -->
+  <script type="module" src="scripts/tracking.js"></script>
 </body>
 </html>
