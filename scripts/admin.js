@@ -1,114 +1,64 @@
-// scripts/admin.js
-import { auth, db } from "./firebase.js";
-import { 
-  signInWithEmailAndPassword, 
-  signOut 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { 
-  ref, set, update 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { ref, set, get, child } from "./scripts/firebase.js";
 
-// Select DOM elements
-const loginSection = document.getElementById("login-section");
-const dashboardSection = document.getElementById("dashboard-section");
-const loginForm = document.getElementById("loginForm");
-const loginMessage = document.getElementById("loginMessage");
-const logoutBtn = document.getElementById("logoutBtn");
+// Function to save shipment
+window.saveShipment = async function () {
+  const trackingId = document.getElementById("trackingId").value.trim();
+  const clientName = document.getElementById("clientName").value.trim();
+  const status = document.getElementById("status").value; // dropdown now
+  const location = document.getElementById("location").value.trim();
+  const stopped = document.getElementById("stopped").checked;
 
-const addShipmentForm = document.getElementById("addShipmentForm");
-const updateShipmentForm = document.getElementById("updateShipmentForm");
-const stopShipmentForm = document.getElementById("stopShipmentForm");
+  const resultBox = document.getElementById("adminResult");
+  resultBox.innerHTML = "";
 
-// -------------------- LOGIN --------------------
-loginForm.addEventListener("submit", (e) => {
-  e.preventDefault();
+  if (!trackingId) {
+    resultBox.innerHTML = "<p class='error'>⚠️ Tracking ID is required.</p>";
+    return;
+  }
 
-  const email = document.getElementById("adminEmail").value;
-  const password = document.getElementById("adminPassword").value;
-
-  signInWithEmailAndPassword(auth, email, password)
-    .then(() => {
-      loginMessage.textContent = "Login successful!";
-      loginSection.style.display = "none";
-      dashboardSection.style.display = "block";
-    })
-    .catch((error) => {
-      loginMessage.textContent = "Login failed: " + error.message;
+  try {
+    await set(ref(window.database, "shipments/" + trackingId), {
+      clientName,
+      status,
+      location,
+      stopped,
     });
-});
 
-// -------------------- LOGOUT --------------------
-logoutBtn.addEventListener("click", () => {
-  signOut(auth).then(() => {
-    loginSection.style.display = "block";
-    dashboardSection.style.display = "none";
-    loginMessage.textContent = "You have logged out.";
-  });
-});
+    resultBox.innerHTML = "<p class='success'>✅ Shipment updated successfully.</p>";
+  } catch (error) {
+    console.error(error);
+    resultBox.innerHTML = "<p class='error'>❌ Error saving shipment.</p>";
+  }
+};
 
-// -------------------- ADD SHIPMENT --------------------
-addShipmentForm.addEventListener("submit", (e) => {
-  e.preventDefault();
+// Function to fetch existing shipment
+window.fetchShipment = async function () {
+  const trackingId = document.getElementById("trackingId").value.trim();
+  const resultBox = document.getElementById("adminResult");
 
-  const trackingNumber = document.getElementById("trackingNumber").value;
-  const clientName = document.getElementById("clientName").value;
-  const origin = document.getElementById("origin").value;
-  const destination = document.getElementById("destination").value;
+  if (!trackingId) {
+    resultBox.innerHTML = "<p class='error'>⚠️ Enter Tracking ID to fetch.</p>";
+    return;
+  }
 
-  set(ref(db, "shipments/" + trackingNumber), {
-    clientName: clientName,
-    origin: origin,
-    destination: destination,
-    status: "Pending",
-    stopped: false,
-    lastUpdated: new Date().toISOString()
-  })
-    .then(() => {
-      alert("Shipment added successfully!");
-      addShipmentForm.reset();
-    })
-    .catch((error) => {
-      alert("Error adding shipment: " + error.message);
-    });
-});
+  try {
+    const dbRef = ref(window.database);
+    const snapshot = await get(child(dbRef, `shipments/${trackingId}`));
 
-// -------------------- UPDATE SHIPMENT --------------------
-updateShipmentForm.addEventListener("submit", (e) => {
-  e.preventDefault();
+    if (snapshot.exists()) {
+      const data = snapshot.val();
 
-  const trackingNumber = document.getElementById("updateTrackingNumber").value;
-  const status = document.getElementById("shipmentStatus").value;
+      document.getElementById("clientName").value = data.clientName || "";
+      document.getElementById("status").value = data.status || "Order Placed";
+      document.getElementById("location").value = data.location || "";
+      document.getElementById("stopped").checked = data.stopped || false;
 
-  update(ref(db, "shipments/" + trackingNumber), {
-    status: status,
-    lastUpdated: new Date().toISOString()
-  })
-    .then(() => {
-      alert("Shipment status updated!");
-      updateShipmentForm.reset();
-    })
-    .catch((error) => {
-      alert("Error updating shipment: " + error.message);
-    });
-});
-
-// -------------------- STOP SHIPMENT --------------------
-stopShipmentForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const trackingNumber = document.getElementById("stopTrackingNumber").value;
-
-  update(ref(db, "shipments/" + trackingNumber), {
-    stopped: true,
-    status: "Stopped",
-    lastUpdated: new Date().toISOString()
-  })
-    .then(() => {
-      alert("Shipment stopped successfully!");
-      stopShipmentForm.reset();
-    })
-    .catch((error) => {
-      alert("Error stopping shipment: " + error.message);
-    });
-});
-        
+      resultBox.innerHTML = "<p class='success'>📦 Shipment data loaded.</p>";
+    } else {
+      resultBox.innerHTML = "<p class='error'>❌ No shipment found with this ID.</p>";
+    }
+  } catch (error) {
+    console.error(error);
+    resultBox.innerHTML = "<p class='error'>⚠️ Error fetching shipment data.</p>";
+  }
+};
