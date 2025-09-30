@@ -1,30 +1,42 @@
 // tracking.js
 
-// Function to initialize Google Map
+// Initialize Google Map
+let map;
+let marker;
+
 function initMap() {
-  // Default location: Manila, Philippines
+  // Default location (Manila) before Firebase loads
   const defaultLocation = { lat: 14.5995, lng: 120.9842 };
 
-  // Create the map centered on default location
-  const map = new google.maps.Map(document.getElementById("map"), {
+  map = new google.maps.Map(document.getElementById("map"), {
     zoom: 12,
     center: defaultLocation,
   });
 
-  // Create marker at the default location
-  const marker = new google.maps.Marker({
+  marker = new google.maps.Marker({
     position: defaultLocation,
     map: map,
     title: "Shipment Location",
   });
 
-  // Example static update (for testing, later replaced by Firebase live data)
-  setTimeout(() => {
-    const newLocation = { lat: 14.6760, lng: 121.0437 }; // Quezon City
-    marker.setPosition(newLocation);
-    map.setCenter(newLocation);
-  }, 5000); // moves after 5 seconds
+  // Start listening to Firebase for live updates
+  listenForLocationUpdates();
 }
 
-// Load map when window finishes loading
+// Listen for live location updates from Firebase
+function listenForLocationUpdates() {
+  const db = firebase.database();
+  const locationRef = db.ref("shipment/location");
+
+  locationRef.on("value", (snapshot) => {
+    const data = snapshot.val();
+    if (data && data.lat && data.lng) {
+      const newLocation = { lat: data.lat, lng: data.lng };
+      marker.setPosition(newLocation);
+      map.setCenter(newLocation);
+    }
+  });
+}
+
+// Load map after page load
 window.onload = initMap;
