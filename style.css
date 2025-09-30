@@ -1,188 +1,60 @@
-/* =============================
-   Global Styles
-============================= */
+/* General */
 body {
-  margin: 0;
   font-family: Arial, sans-serif;
-  background: #f5f7fa;
-  color: #333;
-  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background: #f9f9f9;
 }
-
-/* Container utility */
-.container, .admin-container {
-  width: 90%;
-  max-width: 900px;
-  margin: 30px auto;
-  background: #fff;
-  padding: 20px 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-/* =============================
-   Landing Page
-============================= */
-.landing {
-  text-align: center;
-  padding: 50px 20px;
-}
-
-.landing h1 {
-  font-size: 2.5rem;
-  color: #004aad;
-}
-
-.landing p {
-  font-size: 1.1rem;
-  margin: 15px 0;
-}
-
-.landing button {
-  background: #004aad;
+header, footer {
+  background: #007bff;
   color: #fff;
-  border: none;
-  padding: 12px 24px;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.landing button:hover {
-  background: #003380;
-}
-
-/* =============================
-   Progress Bar
-============================= */
-.progress-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 40px auto;
-  max-width: 700px;
-  position: relative;
-}
-
-.progress-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  z-index: 2;
-}
-
-.step-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #ccc;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-}
-
-.step-label {
-  margin-top: 8px;
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.progress-step.active .step-circle {
-  background: #004aad;
-}
-
-.progress-line {
-  flex: 1;
-  height: 4px;
-  background: #ccc;
-  margin: 0 10px;
-  position: relative;
-  top: -18px;
-  z-index: 1;
-}
-
-.progress-line.active {
-  background: #004aad;
-}
-
-/* =============================
-   Admin Panel
-============================= */
-.admin-container h2 {
   text-align: center;
-  color: #004aad;
+  padding: 15px;
+}
+h1, h2 {
+  margin: 10px 0;
 }
 
-form {
-  margin-top: 20px;
+/* Tracking */
+.tracking-section {
+  text-align: center;
+  margin: 30px auto;
+  max-width: 500px;
 }
-
-form label {
-  display: block;
-  font-weight: bold;
-  margin: 12px 0 6px;
-}
-
-form input, 
-form select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
-}
-
-form input:focus, 
-form select:focus {
-  outline: none;
-  border-color: #004aad;
-  box-shadow: 0 0 4px rgba(0,74,173,0.3);
-}
-
-.btn-group {
+.tracking-box {
   display: flex;
   gap: 10px;
-  margin-top: 20px;
+  justify-content: center;
 }
-
-button {
+.tracking-box input {
+  padding: 10px;
   flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 6px;
-  background: #004aad;
+}
+.tracking-box button {
+  padding: 10px 20px;
+  background: #007bff;
   color: #fff;
-  font-size: 1rem;
+  border: none;
   cursor: pointer;
-  transition: 0.3s;
+  border-radius: 4px;
 }
 
-button:hover {
-  background: #003380;
-}
-
-#adminResult {
+/* Shipment info */
+.shipment-info {
   margin-top: 20px;
   padding: 15px;
-  background: #e9f1ff;
-  border-left: 4px solid #004aad;
-  border-radius: 6px;
-  display: none;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
 }
-/* Progress Bar Styles */
 .progress-bar {
   width: 100%;
   background: #eee;
   border-radius: 20px;
   overflow: hidden;
-  margin-top: 10px;
   height: 15px;
+  margin-top: 10px;
 }
-
 .progress {
   height: 100%;
   background: linear-gradient(90deg, #007bff, #00c6ff);
@@ -190,20 +62,21 @@ button:hover {
   transition: width 0.4s ease;
 }
 
-/* Shipment Info Box */
-.shipment-info {
-  margin-top: 20px;
-  padding: 15px;
-  border: 1px solid #ddd;
+/* Login/Admin */
+.login-section, .admin-section {
+  max-width: 400px;
+  margin: 50px auto;
+  background: #fff;
+  padding: 20px;
   border-radius: 8px;
-  background: #fafafa;
+  text-align: center;
 }
-
-.shipment-info h3 {
-  margin-top: 0;
-  color: #007bff;
+.login-section input, .admin-section input {
+  display: block;
+  margin: 10px auto;
+  padding: 10px;
+  width: 100%;
 }
-
-.shipment-info p {
-  margin: 5px 0;
-   }
+button {
+  cursor: pointer;
+}
