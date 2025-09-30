@@ -1,57 +1,69 @@
-// Import Firebase
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-import { app } from "./scripts/firebase.js";
+// tracking.js
 
-const db = getDatabase(app);
+// Function to track shipment
+async function trackShipment() {
+  const trackingNumber = document.getElementById("trackingNumber").value.trim();
+  const trackingResult = document.getElementById("trackingResult");
+  const currentLocation = document.getElementById("currentLocation");
 
-// Function to track order
-document.getElementById("trackForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const trackingId = document.getElementById("trackingId").value;
-
-  const snapshot = await get(ref(db, "tracking/" + trackingId));
-  if (snapshot.exists()) {
-    const data = snapshot.val();
-
-    // Fill result
-    document.getElementById("res-id").innerText = trackingId;
-    document.getElementById("res-updated").innerText = new Date(data.updatedAt).toLocaleString();
-    document.getElementById("result").style.display = "block";
-
-    // Reset all steps
-    resetSteps();
-
-    // Activate steps based on status
-    if (data.status === "Order Placed") activateStep(1);
-    if (data.status === "Processing") activateStep(2);
-    if (data.status === "Shipped") activateStep(3);
-    if (data.status === "Delivered") activateStep(4);
-  } else {
-    alert("Tracking ID not found");
+  if (!trackingNumber) {
+    alert("Please enter a tracking number.");
+    return;
   }
-});
 
-// Reset steps
-function resetSteps() {
-  for (let i = 1; i <= 4; i++) {
-    document.getElementById(`step-${i}`).classList.remove("active");
+  try {
+    const db = firebase.database();
+    const shipmentRef = db.ref("shipments/" + trackingNumber);
+
+    shipmentRef.on("value", (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+
+        // Show result section
+        trackingResult.classList.remove("hidden");
+
+        // Update progress bar
+        updateProgress(data.status);
+
+        // Update live location
+        currentLocation.textContent = data.location || "Location not available";
+
+      } else {
+        alert("No shipment found for this tracking number.");
+        trackingResult.classList.add("hidden");
+      }
+    });
+  } catch (error) {
+    console.error("Error tracking shipment:", error);
+    alert("An error occurred while fetching tracking details.");
   }
 }
 
-// Activate step
-function activateStep(stepNumber) {
-  resetSteps();
-  for (let i = 1; i <= stepNumber; i++) {
-    document.getElementById(`step-${i}`).classList.add("active");
-  }
+// Function to update progress bar
+function updateProgress(status) {
+  const steps = ["Order Placed", "Processing", "Shipped", "Delivered"];
+  const stepElements = [ 
+    document.getElementById("step1"),
+    document.getElementById("step2"),
+    document.getElementById("step3"),
+    document.getElementById("step4"),
+  ];
 
-  // Animate lines
-  const lines = document.querySelectorAll(".progress-line");
-  lines.forEach((line, index) => {
-    if (index < stepNumber - 1) {
-      line.querySelector("::after"); // ensures transition triggers
-      line.style.setProperty("--line-fill", "100%");
-    }
+  // Reset all steps
+  stepElements.forEach((step) => {
+    step.querySelector(".step-circle").classList.remove("active");
+    step.querySelector(".step-circle").classList.remove("completed");
   });
-}
 
+  // Find index of current status
+  const currentIndex = steps.indexOf(status);
+
+  if (currentIndex !== -1) {
+    // Mark all previous steps as completed
+    for (let i = 0; i < currentIndex; i++) {
+      stepElements[i].querySelector(".step-circle").classList.add("completed");
+    }
+    // Mark current step as active
+    stepElements[currentIndex].querySelector(".step-circle").classList.add("active");
+  }
+}
