@@ -3,17 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Giatech Shipping</title>
+  <title>Giatech Shipping - Track Your Shipment</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Header -->
   <header>
     <h1>Giatech Shipping</h1>
     <p>Fast • Secure • Reliable Delivery Across the Philippines</p>
   </header>
 
-  <!-- Tracking Section -->
   <main>
     <section class="tracking-section">
       <h2>Track Your Shipment</h2>
@@ -21,12 +19,14 @@
         <input type="text" id="trackingInput" placeholder="Enter Tracking Number">
         <button id="trackBtn">Track</button>
       </div>
-      <!-- Where tracking results will appear -->
       <div id="trackingResult"></div>
     </section>
   </main>
 
-  <!-- Firebase and Scripts -->
+  <footer>
+    <p>© 2025 Giatech Shipping | <a href="login.html">Admin Login</a></p>
+  </footer>
+
   <script type="module" src="./scripts/firebase.js"></script>
   <script type="module" src="./scripts/tracking.js"></script>
 </body>
