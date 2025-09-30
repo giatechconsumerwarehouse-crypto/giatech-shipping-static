@@ -1,52 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel - Giatech Shipping</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - Giatech Shipping</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <script type="module" src="scripts/firebase.js"></script>
 </head>
 <body>
-  <div class="admin-container">
-    <h2>📦 Admin Panel</h2>
-    <p>Manage and update shipment details here.</p>
+  <h1>Admin Dashboard - Giatech Shipping</h1>
 
-    <!-- Shipment Form -->
-    <form id="shipmentForm" onsubmit="event.preventDefault(); saveShipment();">
-      <label for="trackingId">Tracking ID:</label>
-      <input type="text" id="trackingId" placeholder="Enter Tracking ID" required />
+  <!-- Protect Admin Page -->
+  <script type="module">
+    import { auth } from "./scripts/firebase.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-      <label for="clientName">Client Name:</label>
-      <input type="text" id="clientName" placeholder="Enter Client Name" />
+    const user = document.createElement("div");
+    user.id = "userBox";
+    document.body.appendChild(user);
 
-      <label for="status">Status:</label>
-      <select id="status">
-        <option value="Order Placed">Order Placed</option>
-        <option value="In Transit">In Transit</option>
-        <option value="Out for Delivery">Out for Delivery</option>
-        <option value="Delivered">Delivered</option>
-      </select>
+    onAuthStateChanged(auth, (u) => {
+      if (!u) {
+        // If not logged in → redirect to login
+        window.location.href = "login.html";
+      } else {
+        user.innerHTML = `
+          Logged in as: <strong>${u.email}</strong>
+          <button id="logoutBtn">Logout</button>
+        `;
+        document.getElementById("logoutBtn").addEventListener("click", async () => {
+          await signOut(auth);
+          window.location.href = "login.html";
+        });
+      }
+    });
+  </script>
 
-      <label for="location">Current Location:</label>
-      <input type="text" id="location" placeholder="Enter Current Location" />
+  <!-- Admin Form -->
+  <form id="adminForm">
+    <input type="text" id="trackingId" placeholder="Tracking ID" required>
+    <input type="text" id="customerName" placeholder="Customer Name" required>
+    <input type="text" id="location" placeholder="Current Location">
 
-      <label>
-        <input type="checkbox" id="stopped" />
-        Stop Shipment (Hold)
-      </label>
+    <select id="status">
+      <option value="Order Placed">Order Placed</option>
+      <option value="Processing">Processing</option>
+      <option value="Shipped">Shipped</option>
+      <option value="Delivered">Delivered</option>
+    </select>
 
-      <div class="btn-group">
-        <button type="submit">💾 Save Shipment</button>
-        <button type="button" onclick="fetchShipment()">🔍 Fetch Shipment</button>
-      </div>
-    </form>
+    <button type="submit">Save / Update Shipment</button>
+  </form>
 
-    <!-- Result box -->
-    <div id="adminResult"></div>
-  </div>
+  <div id="adminResult" style="display:none;" class="result-box"></div>
 
-  <!-- Scripts -->
-  <script type="module" src="scripts/firebase.js"></script>
+  <!-- Admin Script -->
   <script type="module" src="scripts/admin.js"></script>
 </body>
 </html>
