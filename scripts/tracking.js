@@ -2,16 +2,14 @@
 import { db } from "./firebase.js";
 import { ref, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-// Elements
 const trackBtn = document.getElementById("trackBtn");
-const trackingNumberInput = document.getElementById("trackingNumber");
+const trackingInput = document.getElementById("trackingInput");
 const resultContainer = document.getElementById("trackingResult");
 
-// Track button click
 trackBtn.addEventListener("click", async () => {
-  const trackingNumber = trackingNumberInput.value.trim();
+  const trackingNumber = trackingInput.value.trim();
   if (!trackingNumber) {
-    resultContainer.innerHTML = "<p style='color:red;'>Please enter a tracking number.</p>";
+    resultContainer.innerHTML = "<p style='color:red;'>Enter a tracking number.</p>";
     return;
   }
 
@@ -21,13 +19,12 @@ trackBtn.addEventListener("click", async () => {
 
     if (snapshot.exists()) {
       const data = snapshot.val();
-
-      // Display shipment info
       resultContainer.innerHTML = `
         <div class="shipment-info">
-          <h3>Shipment Details</h3>
+          <h3>Shipment ${trackingNumber}</h3>
           <p><strong>Status:</strong> ${data.status}</p>
-          <p><strong>Location:</strong> ${data.location}</p>
+          <p><strong>Origin:</strong> ${data.origin}</p>
+          <p><strong>Destination:</strong> ${data.destination}</p>
           <p><strong>ETA:</strong> ${data.eta}</p>
           <div class="progress-bar">
             <div class="progress" style="width: ${data.progress || 0}%;"></div>
@@ -39,6 +36,6 @@ trackBtn.addEventListener("click", async () => {
     }
   } catch (error) {
     console.error(error);
-    resultContainer.innerHTML = "<p style='color:red;'>Error retrieving data. Please try again later.</p>";
+    resultContainer.innerHTML = "<p style='color:red;'>Error retrieving data.</p>";
   }
 });
