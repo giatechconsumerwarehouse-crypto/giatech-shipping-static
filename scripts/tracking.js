@@ -1,52 +1,80 @@
-import { db } from "./scripts/firebase.js";
-import { ref, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+// ✅ Import Firebase tools
+import { ref, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { db } from "./firebase.js";
 
-// DOM elements
-const form = document.getElementById("tracking-form");
-const resultBox = document.getElementById("result");
-const progressBar = document.getElementById("progress-bar");
-const progressText = document.getElementById("progress-text");
+// ✅ Function to handle tracking search
+window.trackShipment = async function () {
+  const trackingNumber = document.getElementById("trackingNumber").value.trim();
 
-// Shipment steps
-const steps = ["Processing", "In Transit", "At Destination", "Delivered"];
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const trackingId = document.getElementById("trackingId").value.trim();
-  if (!trackingId) {
-    resultBox.textContent = "⚠️ Please enter a tracking ID.";
+  if (!trackingNumber) {
+    alert("⚠️ Please enter a tracking number.");
     return;
   }
 
   try {
-    const snapshot = await get(ref(db, "shipments/" + trackingId));
+    // Reference to Firebase DB
+    const dbRef = ref(db);
+
+    // Get shipment data
+    const snapshot = await get(child(dbRef, `shipments/${trackingNumber}`));
 
     if (snapshot.exists()) {
       const data = snapshot.val();
-      const status = data.status;
 
-      resultBox.textContent = `Shipment Status: ${status}`;
+      // Show progress bar + details
+      document.getElementById("progressContainer").style.display = "flex";
+      document.getElementById("shipmentDetails").style.display = "block";
 
-      // Find which step the status is on
-      const stepIndex = steps.indexOf(status);
+      // ✅ Update details
+      document.getElementById("detailTrackingNumber").textContent = trackingNumber;
+      document.getElementById("detailStatus").textContent = data.status || "Unknown";
+      document.getElementById("detailLocation").textContent = data.location || "Not available";
+      document.getElementById("detailUpdated").textContent = data.updatedAt || "N/A";
 
-      if (stepIndex !== -1) {
-        // Progress = (stepIndex / totalSteps) * 100
-        const progressPercent = ((stepIndex + 1) / steps.length) * 100;
-        progressBar.style.width = progressPercent + "%";
-        progressText.textContent = `Current Stage: ${status}`;
-      } else {
-        progressBar.style.width = "0%";
-        progressText.textContent = "Unknown status.";
-      }
+      // ✅ Update progress bar steps
+      updateProgressBar(data.status);
+
     } else {
-      resultBox.textContent = "❌ Tracking ID not found.";
-      progressBar.style.width = "0%";
-      progressText.textContent = "";
+      alert("❌ Tracking number not found. Please check again.");
+      document.getElementById("progressContainer").style.display = "none";
+      document.getElementById("shipmentDetails").style.display = "none";
     }
+
   } catch (error) {
-    console.error(error);
-    resultBox.textContent = "⚠️ Error retrieving tracking information.";
+    console.error("Error fetching shipment:", error);
+    alert("⚠️ Error loading shipment details.");
   }
-});
+};
+
+// ✅ Function to highlight progress bar
+function updateProgressBar(status) {
+  // Reset all steps
+  const steps = ["step1", "step2", "step3", "step4"];
+  steps.forEach(step => {
+    document.getElementById(step).classList.remove("active");
+  });
+
+  // Map statuses to step numbers
+  let stepIndex = 0;
+  switch (status?.toLowerCase()) {
+    case "order placed":
+      stepIndex = 1;
+      break;
+    case "processing":
+      stepIndex = 2;
+      break;
+    case "shipped":
+      stepIndex = 3;
+      break;
+    case "delivered":
+      stepIndex = 4;
+      break;
+    default:
+      stepIndex = 1;
+  }
+
+  // Activate steps up to current
+  for (let i = 1; i <= stepIndex; i++) {
+    document.getElementById(`step${i}`).classList.add("active");
+  }
+}
