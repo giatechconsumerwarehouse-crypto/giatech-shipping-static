@@ -3,31 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Giatech Shipping - Track Your Shipment</title>
+  <title>Giatech Shipping | Track Your Shipment</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <!-- Firebase Config -->
+  <script src="scripts/firebase.js" defer></script>
+  <!-- Tracking Script -->
+  <script src="scripts/tracking.js" defer></script>
+
+  <!-- Google Maps API -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAY_xfNLLZrU-j3teqmPBRMwibGjQEsn3w&callback=initMap">
+  </script>
 </head>
 <body>
-  <header>
-    <h1>Giatech Shipping</h1>
-    <p>Fast • Secure • Reliable Delivery Across the Philippines</p>
-  </header>
+  <div class="container">
+    <h1>Track Your Shipment</h1>
+    <form id="trackingForm">
+      <label for="trackingInput">Enter Tracking ID:</label>
+      <input type="text" id="trackingInput" required>
+      <button type="submit">Track</button>
+    </form>
 
-  <main>
-    <section class="tracking-section">
-      <h2>Track Your Shipment</h2>
-      <div class="tracking-box">
-        <input type="text" id="trackingInput" placeholder="Enter Tracking Number">
-        <button id="trackBtn">Track</button>
+    <!-- Shipment Details -->
+    <div id="trackingResult" class="hidden">
+      <h2>Shipment Details</h2>
+      <p><strong>Client:</strong> <span id="clientName"></span></p>
+      <p><strong>Origin:</strong> <span id="origin"></span></p>
+      <p><strong>Destination:</strong> <span id="destination"></span></p>
+      <p><strong>Status:</strong> <span id="status"></span></p>
+
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-step" id="step-1">
+          <div class="step-circle">1</div>
+          <div class="step-label">Order Placed</div>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" id="step-2">
+          <div class="step-circle">2</div>
+          <div class="step-label">Processing</div>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" id="step-3">
+          <div class="step-circle">3</div>
+          <div class="step-label">Shipped</div>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" id="step-4">
+          <div class="step-circle">4</div>
+          <div class="step-label">Delivered</div>
+        </div>
       </div>
-      <div id="trackingResult"></div>
-    </section>
-  </main>
 
-  <footer>
-    <p>© 2025 Giatech Shipping | <a href="login.html">Admin Login</a></p>
-  </footer>
+      <!-- Google Map -->
+      <div id="map" style="height:300px; margin-top:20px;"></div>
 
-  <script type="module" src="./scripts/firebase.js"></script>
-  <script type="module" src="./scripts/tracking.js"></script>
+      <!-- Proof of Delivery -->
+      <div id="proofSection" class="hidden">
+        <h3>Proof of Delivery</h3>
+        <img id="proofImage" src="" alt="Delivery Proof" style="max-width:100%; border:1px solid #ccc; border-radius:10px;">
+      </div>
+    </div>
+  </div>
 </body>
 </html>
