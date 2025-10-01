@@ -1,18 +1,25 @@
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { auth } from "./firebase.js";
-
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
+// Handle login
+document.getElementById("loginForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    document.getElementById("loginMessage").textContent = "✅ Login successful!";
-    window.location.href = "admin.html"; // redirect to admin panel
-  } catch (error) {
-    console.error("Login error:", error.message);
-    document.getElementById("loginMessage").textContent = "❌ Invalid credentials!";
+  firebase.auth().signInWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      // Redirect to admin dashboard
+      window.location.href = "admin.html";
+    })
+    .catch(error => {
+      document.getElementById("errorMsg").innerText = error.message;
+    });
+});
+
+// Check auth state
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    console.log("Logged in as:", user.email);
+  } else {
+    console.log("Not logged in");
   }
 });
