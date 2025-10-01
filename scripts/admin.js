@@ -1,3 +1,10 @@
+// Protect admin page
+firebase.auth().onAuthStateChanged(user => {
+  if (!user) {
+    window.location.href = "login.html"; // redirect if not logged in
+  }
+});
+
 // Create Shipment
 document.getElementById("createShipmentForm").addEventListener("submit", function (e) {
   e.preventDefault();
